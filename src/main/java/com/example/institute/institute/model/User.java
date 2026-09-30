@@ -35,7 +35,7 @@ public class User {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    @OneToOne(cascade = CascadeType.ALL,fetch =  FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL,fetch =  FetchType.EAGER)
     @JoinColumn(name ="profile_id" , referencedColumnName = "id")
     private  UserProfile userProfile;
 
