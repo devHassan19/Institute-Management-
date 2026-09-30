@@ -27,6 +27,7 @@ public class UserProfile {
 
     @Column
     private String role;
+//    Accept STUDENT , ADMIN , INSTRUCTOR
 
     @JsonIgnore
     @OneToOne(mappedBy = "userProfile", fetch = FetchType.LAZY)

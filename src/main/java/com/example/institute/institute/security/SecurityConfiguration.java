@@ -37,7 +37,8 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth.requestMatchers(
                                 "/auth/users",
                                 "/auth/users/login",
-                                "/auth/users/register"
+                                "/auth/users/register",
+                                "/auth/users/verify"
                         ).permitAll()
                         .anyRequest().authenticated());
         http.addFilterBefore(authenticationJwtRequestFilter(),
@@ -49,6 +50,4 @@ public class SecurityConfiguration {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
-
-
 }

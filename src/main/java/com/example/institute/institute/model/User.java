@@ -28,6 +28,10 @@ public class User {
     private String emailAddress;
 
     @Column
+    @JsonIgnore
+    private Boolean enabled = false;
+
+    @Column
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 

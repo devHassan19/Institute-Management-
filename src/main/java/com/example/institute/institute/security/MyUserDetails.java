@@ -1,9 +1,8 @@
 package com.example.institute.institute.security;
 
-import com.ga.todo.todo.model.User;
+import com.example.institute.institute.model.User;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -21,7 +20,7 @@ public class MyUserDetails implements UserDetails {
     }
 
     @Override
-    public @Nullable String getPassword() {
+    public String getPassword() {
         return user.getPassword();
     }
 
@@ -47,7 +46,7 @@ public class MyUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return Boolean.TRUE.equals(user.getEnabled());
     }
 
     public User getUser() {
