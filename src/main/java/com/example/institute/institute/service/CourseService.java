@@ -51,7 +51,7 @@ public class CourseService {
 
     public List<Course> getCourses() {
         System.out.println("Service Calling getCourses ==> ");
-        return courseRepository.findAll();   // قائمة فاضية = 200 عادي، مو خطأ
+        return courseRepository.findAll();
     }
 
     public Course getCourse(Long courseId) {
@@ -99,7 +99,7 @@ public class CourseService {
             throw new ForbiddenException("Only admin can delete a course");
         }
 
-        Course course = getCourse(courseId);   // 404 لو مو موجود
+        Course course = getCourse(courseId);
         courseRepository.delete(course);
     }
 }
