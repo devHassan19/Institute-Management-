@@ -17,7 +17,7 @@ public class CourseController {
     private CourseService courseService;
 
     // CRUD
-    // C - Create - HTTP POST - To create a record (course by admin)
+    //Create - HTTP POST - To create a record (course by admin)
 
     //    @PostMapping("/courses")
 //    public Course createCourse(@RequestBody Course courseObject) {
@@ -26,26 +26,26 @@ public class CourseController {
 //    }
     @PostMapping("/courses")
     public ResponseEntity<Course> createCourse(@RequestBody Course course) {
-                System.out.println("Calling createCourse ==> ");
-        return ResponseEntity.status(HttpStatus.CREATED)         // 201
+        System.out.println("Calling createCourse ==> ");
+        return ResponseEntity.status(HttpStatus.CREATED)
                 .body(courseService.createCourse(course));
     }
 
-    // R - Read all
+    // Read all
     @GetMapping("/courses")
     public ResponseEntity<List<Course>> getCourses() {
         System.out.println("Calling getCourses ==> ");
         return ResponseEntity.ok(courseService.getCourses());                    // 200
     }
 
-    // R - Read one
+    // Read one
     @GetMapping("/courses/{courseId}")
     public ResponseEntity<Course> getCourse(@PathVariable Long courseId) {
         System.out.println("Calling getCourse ==> ");
         return ResponseEntity.ok(courseService.getCourse(courseId));             // 200
     }
 
-    // U - Update
+    // Update
     @PutMapping("/courses/{courseId}")
     public ResponseEntity<Course> updateCourse(@PathVariable Long courseId,
                                                @RequestBody Course course) {
@@ -53,7 +53,7 @@ public class CourseController {
         return ResponseEntity.ok(courseService.updateCourse(courseId, course)); // 200
     }
 
-    // D - Delete
+    // Delete
     @DeleteMapping("/courses/{courseId}")
     public ResponseEntity<Void> deleteCourse(@PathVariable Long courseId) {
         System.out.println("Calling deleteCourse ==> ");
