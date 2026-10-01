@@ -25,7 +25,7 @@ public class CourseService {
     public Course createCourse(Course course) {
         User currentUser = getCurrentLogginUser();
         String role = currentUser.getUserProfile().getRole();
-
+        System.out.println("Service Calling createCourse ==> ");
         // 403: مسجّل دخول بس ما عنده صلاحية
         if (!"ADMIN".equals(role)) {
             throw new ForbiddenException("Only admin can create a course");
