@@ -1,6 +1,5 @@
 package com.example.institute.institute.controller;
 
-import com.example.institute.institute.model.Course;
 import com.example.institute.institute.model.Instructor;
 import com.example.institute.institute.service.InstructorService;
 import lombok.AllArgsConstructor;

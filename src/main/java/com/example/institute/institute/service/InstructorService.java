@@ -61,7 +61,7 @@ public class InstructorService {
         System.out.println("Service Calling updateInstructor ==> ");
         User currentUser = getCurrentLogginUser();
         if (!"ADMIN".equals(currentUser.getUserProfile().getRole())) {
-            throw new ForbiddenException("Only admin can update a course");
+            throw new ForbiddenException("Only admin can update a instructor");
         }
 
         Instructor instructor = getInstructor(insInstructorId);

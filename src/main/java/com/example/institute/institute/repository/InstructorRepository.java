@@ -5,5 +5,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface InstructorRepository extends JpaRepository<Instructor, Long> {
     Instructor findByName(String name);
-    Instructor findByNameAndDescription(String name, String desc);
-}
+    Instructor findByNameAndEmail(String name, String email);}
