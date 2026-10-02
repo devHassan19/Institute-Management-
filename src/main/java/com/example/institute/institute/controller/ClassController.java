@@ -1,8 +1,8 @@
 package com.example.institute.institute.controller;
 
-import com.example.institute.institute.model.Instructor;
+import com.example.institute.institute.model.Class;
 import com.example.institute.institute.service.ClassService;
-import lombok.AllArgsConstructor;
+import lombok.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,12 +22,13 @@ public class ClassController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(classService.createClass(classObject));
     }
-//
-//    @GetMapping("/classes")
-//    public ResponseEntity<List<Class>> getAllClasses() {
-//        System.out.println("Calling getAllClasses ==> ");
-//        return ResponseEntity.ok(classService.getClass());
-//    }
+
+    @GetMapping("/classes")
+    public ResponseEntity<List<Class>> getAllClasses() {
+        System.out.println("Calling getAllClasses ==> ");
+        return ResponseEntity.ok(classService.getClasses());
+    }
+
 
 
 }
