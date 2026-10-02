@@ -24,6 +24,9 @@ public class Class {
     private String name;
 
     @Column
+    private int capacity;
+
+    @Column
     private LocalDate startDate;
 
     @Column
