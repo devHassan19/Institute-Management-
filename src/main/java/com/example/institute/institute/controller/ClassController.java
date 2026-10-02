@@ -29,6 +29,10 @@ public class ClassController {
         return ResponseEntity.ok(classService.getClasses());
     }
 
-
+    @GetMapping("/classes/{classId}")
+    public ResponseEntity<Class> getClass(@PathVariable("classId") Long classId) {
+        System.out.println("Calling getClass ==> ");
+        return ResponseEntity.ok(classService.getClass(classId));
+    }
 
 }
