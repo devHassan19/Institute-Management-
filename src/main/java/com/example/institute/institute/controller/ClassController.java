@@ -42,4 +42,10 @@ public class ClassController {
         return ResponseEntity.ok(classService.updateClass(classId, classObject));
     }
 
+    @DeleteMapping("/classes/{classId}")
+    public ResponseEntity<Void> deleteClass(@PathVariable("classId") Long classId) {
+        System.out.println("Calling deleteClass ==> ");
+        classService.deleteClass(classId);
+        return ResponseEntity.noContent().build();
+    }
 }
