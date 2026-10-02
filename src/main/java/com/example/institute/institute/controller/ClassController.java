@@ -35,4 +35,11 @@ public class ClassController {
         return ResponseEntity.ok(classService.getClass(classId));
     }
 
+    @PutMapping("/classes/{classId}")
+    public ResponseEntity<Class> updateClass(@PathVariable("classId") Long classId,
+                                             @RequestBody Class classObject) {
+        System.out.println("Calling updateClass ==> ");
+        return ResponseEntity.ok(classService.updateClass(classId, classObject));
+    }
+
 }
