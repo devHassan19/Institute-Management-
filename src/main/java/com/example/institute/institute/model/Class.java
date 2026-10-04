@@ -36,5 +36,13 @@ public class Class {
     @Enumerated(EnumType.STRING)
     private Set<DayOfWeek> days;
 
+    @ManyToOne
+    @JoinColumn(name = "course_id", nullable = false)
+    private Course course;
+
+    @ManyToOne
+    @JoinColumn(name = "instructor_id", nullable = false)
+    private Instructor instructor;
+
 
 }
