@@ -24,9 +24,6 @@ public class Student {
     private String name;
 
     @Column
-    private String description;
-
-    @Column
     @CreationTimestamp
     private LocalDateTime createdAt;
 

@@ -1,5 +1,6 @@
 package com.example.institute.institute.controller;
 
+import com.example.institute.institute.model.Instructor;
 import com.example.institute.institute.model.Student;
 import com.example.institute.institute.service.StudentService;
 import lombok.*;
@@ -20,21 +21,21 @@ public class StudentController {
         return ResponseEntity.ok(studentService.getStudents());
     }
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<Student> getById(@PathVariable Long id) {
-//        return ResponseEntity.ok(studentService.getById(id));                 // 200
-//    }
+    @GetMapping("/students/{studentId}")
+    public ResponseEntity<Student> getStudent(@PathVariable Long studentId) {
+        System.out.println("Calling getStudent ==> ");
+        return ResponseEntity.ok(studentService.getStudent(studentId));
+    }
 
-//    @PostMapping
-//    public ResponseEntity<Student> create(@RequestBody Student student) {
-//        return ResponseEntity.status(HttpStatus.CREATED)                      // 201
-//                .body(studentService.create(student));
-//    }
 
-//    @PutMapping("/{id}")
-//    public ResponseEntity<Student> update(@PathVariable Long id, @RequestBody Student student) {
-//        return ResponseEntity.ok(studentService.update(id, student));         // 200
-//    }
+    @PutMapping("students/{studentId}")
+    public ResponseEntity<Student> update(@PathVariable long studentId,
+                                          @RequestBody Student studentObject) {
+        System.out.println("Calling updateStudent ==> ");
+        studentObject.setId(studentId);
+
+        return ResponseEntity.ok(studentService.updateStudent(studentObject));
+    }
 
 //    @DeleteMapping("/{id}")
 //    public ResponseEntity<Void> delete(@PathVariable Long id) {
