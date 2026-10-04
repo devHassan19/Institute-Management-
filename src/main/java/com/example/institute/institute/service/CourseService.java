@@ -24,7 +24,7 @@ public class CourseService {
 
     public Course createCourse(Course course) {
         User currentUser = getCurrentLogginUser();
-        String role = currentUser.getUserProfile().getRole();
+        String role = currentUser.getRole();
         System.out.println("Service Calling createCourse ==> ");
         // 403: مسجّل دخول بس ما عنده صلاحية
         if (!"ADMIN".equals(role)) {
@@ -66,7 +66,7 @@ public class CourseService {
 
         // 403: مو أدمن
         User currentUser = getCurrentLogginUser();
-        if (!"ADMIN".equals(currentUser.getUserProfile().getRole())) {
+        if (!"ADMIN".equals(currentUser.getRole())) {
             throw new ForbiddenException("Only admin can update a course");
         }
 
@@ -95,7 +95,7 @@ public class CourseService {
 
         // 403: مو أدمن
         User currentUser = getCurrentLogginUser();
-        if (!"ADMIN".equals(currentUser.getUserProfile().getRole())) {
+        if (!"ADMIN".equals(currentUser.getRole())) {
             throw new ForbiddenException("Only admin can delete a course");
         }
 

@@ -37,7 +37,7 @@ public class ClassService {
 
     public Class createClass(Class classObject) {
         User currentUser = getCurrentLogginUser();
-        String role = currentUser.getUserProfile().getRole();
+        String role = currentUser.getRole();
         System.out.println("Service Calling createClass ==> ");
 
         if (!"ADMIN".equals(role)) {
@@ -89,7 +89,7 @@ public class ClassService {
     public Class updateClass(Long classId, Class classObject) {
         System.out.println("Service Calling updateClass ==> ");
         User currentUser = getCurrentLogginUser();
-        if (!"ADMIN".equals(currentUser.getUserProfile().getRole())) {
+        if (!"ADMIN".equals(currentUser.getRole())) {
             throw new ForbiddenException("Only admin can update a instructor");
         }
 
@@ -116,7 +116,7 @@ public class ClassService {
         System.out.println("Service Calling deleteClass ==> ");
 
         User currentUser = getCurrentLogginUser();
-        if (!"ADMIN".equals(currentUser.getUserProfile().getRole())) {
+        if (!"ADMIN".equals(currentUser.getRole())) {
             throw new ForbiddenException("Only admin can Delete a Instructor");
         }
 

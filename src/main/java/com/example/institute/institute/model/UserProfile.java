@@ -21,13 +21,12 @@ public class UserProfile {
 
     @Column
     private String firstName;
-    @Column
 
+    @Column
     private String lastName;
 
     @Column
-    private String role;
-//    Accept STUDENT , ADMIN , INSTRUCTOR
+    private String mobileNumber;
 
     @JsonIgnore
     @OneToOne(mappedBy = "userProfile", fetch = FetchType.LAZY)
