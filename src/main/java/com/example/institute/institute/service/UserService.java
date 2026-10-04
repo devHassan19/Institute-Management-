@@ -1,6 +1,7 @@
 package com.example.institute.institute.service;
 
 import com.example.institute.institute.exception.InformationExistException;
+import com.example.institute.institute.model.Student;
 import com.example.institute.institute.model.User;
 import com.example.institute.institute.model.VerificationToken;
 import com.example.institute.institute.model.request.LoginRequest;
@@ -58,13 +59,22 @@ public class UserService {
         if (!userRepository.existsByEmailAddress(userObject.getEmailAddress())) {
             userObject.setPassword(passwordEncoder.encode(userObject.getPassword()));
             userObject.setEnabled(false);
+
+            if ("STUDENT".equals(userObject.getRole())) {
+                Student student = new Student();
+                student.setName(userObject.getUsername());
+                student.setUser(userObject);
+
+                userObject.setStudent(student);
+            }
+
             User saved = userRepository.save(userObject);
-
             VerificationToken token = new VerificationToken(saved);
-            tokenRepository.save(token);
 
+            tokenRepository.save(token);
             emailService.sendVerificationEmail(saved.getEmailAddress(), token.getToken());
             return saved;
+
         } else {
             throw new InformationExistException("Already exists");
         }

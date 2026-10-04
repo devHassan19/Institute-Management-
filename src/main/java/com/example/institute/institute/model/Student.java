@@ -1,5 +1,6 @@
 package com.example.institute.institute.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.*;
@@ -33,7 +34,9 @@ public class Student {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-
-
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
+    private User user;
 
 }

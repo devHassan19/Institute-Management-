@@ -43,6 +43,9 @@ public class User {
     @JoinColumn(name ="profile_id" , referencedColumnName = "id")
     private  UserProfile userProfile;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Student student;
+
 //    @OneToMany(mappedBy = "user" , fetch = FetchType.LAZY)
 //    private List<Category> categoryList;
 
