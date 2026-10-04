@@ -5,10 +5,15 @@ import com.example.institute.institute.exception.ForbiddenException;
 import com.example.institute.institute.exception.InformationExistException;
 import com.example.institute.institute.exception.InformationNotFoundException;
 import com.example.institute.institute.model.Class;
+import com.example.institute.institute.model.Course;
+import com.example.institute.institute.model.Instructor;
 import com.example.institute.institute.model.User;
 import com.example.institute.institute.repository.ClassRepository;
+import com.example.institute.institute.repository.CourseRepository;
+import com.example.institute.institute.repository.InstructorRepository;
 import com.example.institute.institute.security.MyUserDetails;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +24,11 @@ import java.util.List;
 public class ClassService {
 
     private ClassRepository classRepository;
+    @Autowired
+    private CourseRepository courseRepository;
+
+    @Autowired
+    private InstructorRepository instructorRepository;
 
     public static User getCurrentLogginUser() {
         MyUserDetails myUserDetails = (MyUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -41,6 +51,25 @@ public class ClassService {
         if (classRepository.findByName(classObject.getName()) != null) {
             throw new InformationExistException("Class already exists");
         }
+
+        if (classObject.getCourse() == null || classObject.getCourse().getId() == null) {
+            throw new BadRequestException("Course is required");
+        }
+
+        if (classObject.getInstructor() == null || classObject.getInstructor().getId() == null) {
+            throw new BadRequestException("Instructor is required");
+        }
+
+        Course course = courseRepository.findById(classObject.getCourse()
+                .getId()).orElseThrow(() ->
+                        new InformationNotFoundException("Course not found"));
+
+        Instructor instructor = instructorRepository.findById(classObject.getInstructor()
+                .getId()).orElseThrow(() ->
+                        new InformationNotFoundException("Instructor not found"));
+
+        classObject.setCourse(course);
+        classObject.setInstructor(instructor);
 
         return classRepository.save(classObject);
     }
