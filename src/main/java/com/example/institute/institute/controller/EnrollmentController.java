@@ -30,12 +30,13 @@ public class EnrollmentController {
         return enrollmentService.getEnrollments();
     }
 
-
-    @GetMapping("/myEnrollmrnt")
-    public List<Enrollment> getMyEnrollments() {
+    @GetMapping("/enrollmrnts/{enrollmentId}")
+    public Enrollment getEnrollment(@PathVariable Long enrollmentId) {
         System.out.println("Calling getMyEnrollments ==> ");
-        return enrollmentService.getMyEnrollments();
+        return enrollmentService.getEnrollment(enrollmentId);
     }
+
+
     
     
 }
