@@ -23,6 +23,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.institute.institute.model.UserStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 
@@ -118,5 +120,21 @@ public class UserService {
         tokenRepository.delete(vt);
 
         return ResponseEntity.ok("Account verified successfully");
+    }
+
+    @Transactional
+    public void deleteUser(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        user.setUserStatus(UserStatus.INACTIVE);
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void reactivateUser(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        user.setUserStatus(UserStatus.ACTIVE);
+        userRepository.save(user);
     }
 }
