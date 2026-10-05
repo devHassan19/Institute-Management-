@@ -17,14 +17,12 @@ public class Enrollment {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "student_id" , nullable = false)
+    @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
     @ManyToOne
-    @JoinColumn(name = "class_id" , nullable = false)
+    @JoinColumn(name = "class_id", nullable = false)
     private Class aClass;
-
-
 
 
 }
