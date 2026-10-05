@@ -32,6 +32,9 @@ public class EnrollmentService {
 
     public Enrollment createIEnrollment(Enrollment enrollment) {
         User currentUser = getCurrentLogginUser();
+        if (currentUser.getUserStatus() != UserStatus.ACTIVE) {
+            throw new ForbiddenException("Your account has been deactivated");
+        }
         Student student = studentRepository.findByUser_Id(currentUser.getId());
         System.out.println("Service Calling createEnrollment ==> ");
 
@@ -82,6 +85,9 @@ public class EnrollmentService {
 
     public List<Enrollment> getMyEnrollments() {
         User currentUser = getCurrentLogginUser();
+        if (currentUser.getUserStatus() != UserStatus.ACTIVE) {
+            throw new ForbiddenException("Your account has been deactivated");
+        }
         System.out.println("Service Calling getMyEnrollments ==> ");
 
         Student student = studentRepository.findByUser_Id(currentUser.getId());
@@ -93,9 +99,8 @@ public class EnrollmentService {
 
 
     public void deleteEnrollment(Long enrollmentId) {
-        System.out.println("Service Calling deleteEnrollment ==> ");
-
         User currentUser = getCurrentLogginUser();
+        System.out.println("Service Calling deleteEnrollment ==> ");
         if (!"ADMIN".equals(currentUser.getRole())) {
             throw new ForbiddenException("Only admin can Delete a Enrollment");
         }
@@ -105,8 +110,11 @@ public class EnrollmentService {
     }
 
     public void deleteMyEnrollment(Long enrollmentId) {
-        System.out.println("Service Calling deleteMyEnrollment ==> ");
         User currentUser = getCurrentLogginUser();
+        if (currentUser.getUserStatus() != UserStatus.ACTIVE) {
+            throw new ForbiddenException("Your account has been deactivated");
+        }
+        System.out.println("Service Calling deleteMyEnrollment ==> ");
         Student student = studentRepository.findByUser_Id(currentUser.getId());
         if (student == null) {
             throw new InformationNotFoundException("Student not found");
