@@ -93,11 +93,11 @@ public class EnrollmentService {
 
 
     public void deleteEnrollment(Long enrollmentId) {
-        System.out.println("Service Calling deleteInstructor ==> ");
+        System.out.println("Service Calling deleteEnrollment ==> ");
 
         User currentUser = getCurrentLogginUser();
         if (!"ADMIN".equals(currentUser.getRole())) {
-            throw new ForbiddenException("Only admin can Delete a Instructor");
+            throw new ForbiddenException("Only admin can Delete a Enrollment");
         }
 
         Enrollment enrollment = getEnrollment(enrollmentId);
