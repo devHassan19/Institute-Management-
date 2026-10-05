@@ -2,12 +2,10 @@ package com.example.institute.institute.service;
 
 import com.example.institute.institute.exception.BadRequestException;
 import com.example.institute.institute.exception.ForbiddenException;
-import com.example.institute.institute.model.Class;
+import com.example.institute.institute.model.*;
 import com.example.institute.institute.exception.InformationExistException;
 import com.example.institute.institute.exception.InformationNotFoundException;
-import com.example.institute.institute.model.Enrollment;
-import com.example.institute.institute.model.Student;
-import com.example.institute.institute.model.User;
+import com.example.institute.institute.model.Class;
 import com.example.institute.institute.repository.ClassRepository;
 import com.example.institute.institute.repository.EnrollmrntRepository;
 import com.example.institute.institute.repository.StudentRepository;
@@ -98,5 +96,41 @@ public class EnrollmentService {
         enrollment.setStudent(student);
         enrollment.setAClass(aclass);
         return enrollmrntRepository.save(enrollment);
+    }
+
+    public List<Enrollment> getEnrollments() {
+        System.out.println("Service Calling getInstructor ==> ");
+        return enrollmrntRepository.findAll();
+    }
+
+    public Enrollment getEnrollment(Long enrollmentId) {
+        System.out.println("Service Calling getEnrollment ==> ");
+        return enrollmrntRepository.findById(enrollmentId)
+                .orElseThrow(() -> new InformationNotFoundException(
+                        "Enrollment with id " + enrollmentId + " not found"));
+    }
+
+    public List<Enrollment> getMyEnrollments() {
+        User currentUser = getCurrentLogginUser();
+        System.out.println("Service Calling getMyEnrollments ==> ");
+
+        Student student = studentRepository.findByUser_Id(currentUser.getId());
+        if (student == null) {
+            throw new InformationNotFoundException("Student not found");
+        }
+        return enrollmrntRepository.findByStudent(student);
+    }
+
+
+    public void deleteEnrollment(Long enrollmentId) {
+        System.out.println("Service Calling deleteInstructor ==> ");
+
+        User currentUser = getCurrentLogginUser();
+        if (!"ADMIN".equals(currentUser.getRole())) {
+            throw new ForbiddenException("Only admin can Delete a Instructor");
+        }
+
+        Enrollment enrollment = getEnrollment(enrollmentId);
+        enrollmrntRepository.delete(enrollment);
     }
 }
