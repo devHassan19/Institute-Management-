@@ -1,6 +1,8 @@
 package com.example.institute.institute.controller;
 
 import com.example.institute.institute.model.Course;
+import com.example.institute.institute.model.request.CourseRequest;
+import com.example.institute.institute.model.response.CourseResponse;
 import com.example.institute.institute.service.CourseService;
 import lombok.*;
 import org.springframework.http.HttpStatus;
@@ -16,19 +18,29 @@ public class CourseController {
 
     private CourseService courseService;
 
+    private Course toEntity(CourseRequest request) {
+        Course course = new Course();
+        course.setName(request.getName());
+        course.setDescription(request.getDescription());
+        course.setDuration(request.getDuration());
+        return course;
+    }
+
     // CRUD
     //Create - HTTP POST - To create a record (course by admin)
-
-    //    @PostMapping("/courses")
-//    public Course createCourse(@RequestBody Course courseObject) {
+//    @PostMapping("/courses")
+//    public ResponseEntity<Course> createCourse(@RequestBody Course course) {
 //        System.out.println("Calling createCourse ==> ");
-//        return courseService.createCourse(courseObject);
+//        return ResponseEntity.status(HttpStatus.CREATED)
+//                .body(courseService.createCourse(course));
 //    }
+
     @PostMapping("/courses")
-    public ResponseEntity<Course> createCourse(@RequestBody Course course) {
+    public ResponseEntity<CourseResponse> createCourse(@RequestBody CourseRequest request) {
         System.out.println("Calling createCourse ==> ");
+        Course saved = courseService.createCourse(toEntity(request));
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(courseService.createCourse(course));
+                .body(CourseResponse.from(saved));
     }
 
     // Read all

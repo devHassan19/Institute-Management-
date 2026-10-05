@@ -25,7 +25,6 @@ public class UserController {
         return userService.loginUser(loginRequest);
     }
 
-    // الجديد: رابط التفعيل
     @GetMapping("/users/verify")
     public ResponseEntity<String> verify(@RequestParam String token){
         return userService.verifyUser(token);
