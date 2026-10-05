@@ -1,10 +1,13 @@
 package com.example.institute.institute.repository;
 
+import com.example.institute.institute.model.Class;
 import com.example.institute.institute.model.Enrollment;
+import com.example.institute.institute.model.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface EnrollmrntRepository extends JpaRepository<Enrollment , Long> {
-    Enrollment findByStudentIdAndAClassId(Long studentId, Long classId);
-    long countByAClassId(Long classId);
+import java.util.List;
 
+public interface EnrollmrntRepository extends JpaRepository<Enrollment, Long> {
+    List<Enrollment> findByStudent(Student student);
+    List<Enrollment> findByaClass(Class aClass);
 }
