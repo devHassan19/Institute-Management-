@@ -54,4 +54,8 @@ public class User {
         return password;
     }
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @JsonIgnore
+    private UserStatus userStatus = UserStatus.ACTIVE;
 }
