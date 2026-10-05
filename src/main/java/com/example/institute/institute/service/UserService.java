@@ -95,6 +95,11 @@ public class UserService {
             final String JWT = jwtUtils.generateJwtToken(myUserDetails);
             return ResponseEntity.ok(new LoginResponse(JWT));
         } catch (DisabledException e) {
+            User user = userRepository.findByEmailAddress(loginRequest.getEmail());
+            if (user != null && user.getUserStatus() == UserStatus.INACTIVE) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(new LoginResponse("Your account has been deactivated"));
+            }
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(new LoginResponse("Please verify your email first"));
         } catch (AuthenticationException e) {
