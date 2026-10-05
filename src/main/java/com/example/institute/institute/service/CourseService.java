@@ -76,6 +76,7 @@ public class CourseService {
 
         // 403: مو أدمن
         User currentUser = getCurrentLogginUser();
+        long userId = currentUser.getId();
         if (!"ADMIN".equals(currentUser.getRole())) {
             throw new ForbiddenException("Only admin can update a course");
         }
@@ -97,7 +98,17 @@ public class CourseService {
 
         course.setName(courseObject.getName());
         course.setDescription(courseObject.getDescription());
-        return courseRepository.save(course);
+
+        Course savedCourse = courseRepository.save(course);
+
+        auditLogService.createLog(
+                userId,
+                "UPDATE",
+                "Course",
+                savedCourse.getId(),
+                "UPDATE course: " + course.getName()
+        );
+        return savedCourse;
     }
 
     public void deleteCourse(Long courseId) {
