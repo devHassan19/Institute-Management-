@@ -1,6 +1,7 @@
 package com.example.institute.institute.security;
 
 import com.example.institute.institute.model.User;
+import com.example.institute.institute.model.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -46,8 +47,8 @@ public class MyUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return Boolean.TRUE.equals(user.getEnabled());
-    }
+        return Boolean.TRUE.equals(user.getEnabled()) &&
+                user.getUserStatus() == UserStatus.ACTIVE;}
 
     public User getUser() {
         return user;
