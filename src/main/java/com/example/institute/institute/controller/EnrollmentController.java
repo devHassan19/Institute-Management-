@@ -41,6 +41,12 @@ public class EnrollmentController {
         System.out.println("Calling getMyEnrollments ==> ");
         return enrollmentService.getMyEnrollments();
     }
-    
+
+    @DeleteMapping("/enrollmrnts/{enrollmentId}")
+    public ResponseEntity<Enrollment> deleteEnrollment(@PathVariable Long enrollmentId) {
+        System.out.println("Calling deleteEnrollment ==> ");
+        enrollmentService.deleteEnrollment(enrollmentId);
+        return ResponseEntity.noContent().build();
+    }
     
 }
