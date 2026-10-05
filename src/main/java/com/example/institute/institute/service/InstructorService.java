@@ -81,7 +81,7 @@ public class InstructorService {
     }
 
     public void deleteInstructor(Long instructorId) {
-        System.out.println("SClasservice Calling deleteInstructor ==> ");
+        System.out.println("Service Calling deleteInstructor ==> ");
 
         User currentUser = getCurrentLogginUser();
         if (!"ADMIN".equals(currentUser.getRole())) {

@@ -29,45 +29,6 @@ public class EnrollmentService {
         MyUserDetails myUserDetails = (MyUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return myUserDetails.getUser();
     }
-//    public Enrollment getEnrollment(Long instructorId) {}
-//public Enrollment createIEnrollment(Enrollment enrollment) {
-//    User currentUser = getCurrentLogginUser();
-//    String role = currentUser.getRole();
-//    System.out.println("Service Calling createEnrollment ==> ");
-//
-//    Student student = studentRepository.findByUser_Id(currentUser.getId());
-//
-//    if (student == null) {
-//        throw new InformationNotFoundException("Student not found");
-//    }
-//
-//    Long studentId = student.getId();
-//    Long classId = enrollment.getAClass().getId();
-//
-//    Class classObject = classRepository.findById(classId)
-//            .orElseThrow(() ->
-//                    new InformationNotFoundException("Class not found"));
-//
-//    long enrollmentCount =
-//            enrollmrntRepository.countByAClassId(classId);
-//
-//    int capacity =
-//            classObject.getCapacity();
-//
-//    enrollment.setAClass(classObject);
-//
-//    if (enrollmrntRepository.findByStudentIdAndAClassId(studentId, classId) != null) {
-//        throw new InformationExistException("Student is already enrolled in this class");
-//    }
-//
-//    long enrollmentCount = enrollmrntRepository.countByAClassId(classId);
-//    int capacity = enrollment.getAClass().getCapacity();
-//    if (enrollmentCount >= capacity) {
-//        throw new InformationExistException("Class is full");
-//    }
-//
-//    return enrollmrntRepository.save(enrollment);
-//}
 
     public Enrollment createIEnrollment(Enrollment enrollment) {
         User currentUser = getCurrentLogginUser();
@@ -100,11 +61,20 @@ public class EnrollmentService {
 
     public List<Enrollment> getEnrollments() {
         System.out.println("Service Calling getInstructor ==> ");
+        User currentUser = getCurrentLogginUser();
+        if (!"ADMIN".equals(currentUser.getRole())) {
+            throw new ForbiddenException("Only admin can Display all Enrollments");
+        }
         return enrollmrntRepository.findAll();
     }
 
     public Enrollment getEnrollment(Long enrollmentId) {
+        User currentUser = getCurrentLogginUser();
         System.out.println("Service Calling getEnrollment ==> ");
+        if (!"ADMIN".equals(currentUser.getRole())) {
+            throw new ForbiddenException("Only admin can See This Enrollments");
+        }
+
         return enrollmrntRepository.findById(enrollmentId)
                 .orElseThrow(() -> new InformationNotFoundException(
                         "Enrollment with id " + enrollmentId + " not found"));
