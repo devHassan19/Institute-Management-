@@ -35,7 +35,7 @@ public class StudentService {
         }
 
         String passRole = "STUDENT";
-        return  studentRepository.findAllByUser_Role(passRole);
+        return studentRepository.findAllByUser_Role(passRole);
     }
 
 
@@ -52,14 +52,9 @@ public class StudentService {
 
         User currentUser = getCurrentLogginUser();
         String role = currentUser.getRole();
-        Student currentStudent = studentRepository.findById(student.getId())
-                .orElseThrow(() ->
-                        new InformationNotFoundException(
-                                "Student with id " + student.getId() + " not found"));
-
-//        if (!"ADMIN".equals(role)) {
-//            throw new ForbiddenException("You can only update your own profile");
-//        }
+        Student currentStudent = studentRepository.findById(student.getId()).orElseThrow(() ->
+                new InformationNotFoundException(
+                        "Student with id " + student.getId() + " not found"));
 
         if (!currentStudent.getUser().getId().equals(currentUser.getId())) {
             throw new ForbiddenException("You can only update your own profile");

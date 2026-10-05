@@ -1,5 +1,6 @@
 package com.example.institute.institute.service;
 
+import com.example.institute.institute.exception.ForbiddenException;
 import com.example.institute.institute.exception.InformationExistException;
 import com.example.institute.institute.model.Student;
 import com.example.institute.institute.model.User;
@@ -37,6 +38,13 @@ public class UserService {
     private final VerificationTokenRepository tokenRepository;
     private final EmailService emailService;
     private MyUserDetails myUserDetails;
+
+    private void checkAdmin() {
+        User currentUser = StudentService.getCurrentLogginUser();
+        if (!"ADMIN".equals(currentUser.getRole())) {
+            throw new ForbiddenException("Only admin can perform this action");
+        }
+    }
 
     @Autowired
     public UserService(UserRepository userRepository,
@@ -129,6 +137,7 @@ public class UserService {
 
     @Transactional
     public void deleteUser(Long id) {
+        checkAdmin();
         User user = userRepository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         user.setUserStatus(UserStatus.INACTIVE);
@@ -137,6 +146,7 @@ public class UserService {
 
     @Transactional
     public void reactivateUser(Long id) {
+        checkAdmin();
         User user = userRepository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         user.setUserStatus(UserStatus.ACTIVE);
