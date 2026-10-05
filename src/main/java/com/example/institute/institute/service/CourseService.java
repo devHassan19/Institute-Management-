@@ -16,6 +16,7 @@ import java.util.List;
 public class CourseService {
 
     private CourseRepository courseRepository;
+    private AuditLogService auditLogService;
 
     public static User getCurrentLogginUser() {
         MyUserDetails myUserDetails = (MyUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -25,6 +26,7 @@ public class CourseService {
     public Course createCourse(Course course) {
         User currentUser = getCurrentLogginUser();
         String role = currentUser.getRole();
+        Long userId = currentUser.getId();
         System.out.println("Service Calling createCourse ==> ");
         // 403: مسجّل دخول بس ما عنده صلاحية
         if (!"ADMIN".equals(role)) {
@@ -45,8 +47,16 @@ public class CourseService {
         if (courseRepository.findByName(course.getName()) != null) {
             throw new InformationExistException("Course already exists");
         }
+        Course savedCourse = courseRepository.save(course);
 
-        return courseRepository.save(course);
+        auditLogService.createLog(
+                userId,
+                "CREATE",
+                "Course",
+                savedCourse.getId(),
+                "Created course: " + course.getName()
+        );
+        return savedCourse;
     }
 
     public List<Course> getCourses() {
