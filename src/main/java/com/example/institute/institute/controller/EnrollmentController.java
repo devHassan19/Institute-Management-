@@ -48,5 +48,11 @@ public class EnrollmentController {
         enrollmentService.deleteEnrollment(enrollmentId);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/myEnrollmrnt/{enrollmentId}")
+    public ResponseEntity<?> deleteMyEnrollment(@PathVariable Long enrollmentId) {
+        enrollmentService.deleteMyEnrollment(enrollmentId);
+        return ResponseEntity.noContent().build();
+    }
     
 }

@@ -103,4 +103,21 @@ public class EnrollmentService {
         Enrollment enrollment = getEnrollment(enrollmentId);
         enrollmrntRepository.delete(enrollment);
     }
+
+    public void deleteMyEnrollment(Long enrollmentId) {
+        System.out.println("Service Calling deleteMyEnrollment ==> ");
+        User currentUser = getCurrentLogginUser();
+        Student student = studentRepository.findByUser_Id(currentUser.getId());
+        if (student == null) {
+            throw new InformationNotFoundException("Student not found");
+        }
+        Enrollment enrollment = enrollmrntRepository.findById(enrollmentId).orElseThrow(() ->
+                new InformationNotFoundException(
+                        "Enrollment with id " + enrollmentId + " not found"));
+
+        if (!enrollment.getStudent().getId().equals(student.getId())) {
+            throw new ForbiddenException("You can only delete your own enrollment");
+        }
+        enrollmrntRepository.delete(enrollment);
+    }
 }
