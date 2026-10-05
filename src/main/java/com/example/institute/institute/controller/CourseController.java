@@ -44,25 +44,44 @@ public class CourseController {
     }
 
     // Read all
+//    @GetMapping("/courses")
+//    public ResponseEntity<List<Course>> getCourses() {
+//        System.out.println("Calling getCourses ==> ");
+//        return ResponseEntity.ok(courseService.getCourses());
+//    }
     @GetMapping("/courses")
-    public ResponseEntity<List<Course>> getCourses() {
+    public ResponseEntity<List<CourseResponse>> getCourses() {
         System.out.println("Calling getCourses ==> ");
-        return ResponseEntity.ok(courseService.getCourses());                    // 200
+        List<CourseResponse> result = courseService.getCourses().stream()
+                .map(CourseResponse::from)
+                .toList();
+        return ResponseEntity.ok(result);
     }
 
     // Read one
+//    @GetMapping("/courses/{courseId}")
+//    public ResponseEntity<Course> getCourse(@PathVariable Long courseId) {
+//        System.out.println("Calling getCourse ==> ");
+//        return ResponseEntity.ok(courseService.getCourse(courseId));             // 200
+//    }
     @GetMapping("/courses/{courseId}")
-    public ResponseEntity<Course> getCourse(@PathVariable Long courseId) {
+    public ResponseEntity<CourseResponse> getCourse(@PathVariable Long courseId) {
         System.out.println("Calling getCourse ==> ");
-        return ResponseEntity.ok(courseService.getCourse(courseId));             // 200
+        return ResponseEntity.ok(CourseResponse.from(courseService.getCourse(courseId)));
     }
 
     // Update
+//    @PutMapping("/courses/{courseId}")
+//    public ResponseEntity<Course> updateCourse(@PathVariable Long courseId,
+//                                               @RequestBody Course course) {
+//        System.out.println("Calling updateCourse ==> ");
+//        return ResponseEntity.ok(courseService.updateCourse(courseId, course)); // 200
+//    }
     @PutMapping("/courses/{courseId}")
-    public ResponseEntity<Course> updateCourse(@PathVariable Long courseId,
-                                               @RequestBody Course course) {
-        System.out.println("Calling updateCourse ==> ");
-        return ResponseEntity.ok(courseService.updateCourse(courseId, course)); // 200
+    public ResponseEntity<CourseResponse> updateCourse(@PathVariable Long courseId,
+                                                          @RequestBody CourseRequest request) {
+        Course updated = courseService.updateCourse(courseId, toEntity(request));
+        return ResponseEntity.ok(CourseResponse.from(updated));
     }
 
     // Delete
