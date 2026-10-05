@@ -36,7 +36,11 @@ public class EnrollmentController {
         return enrollmentService.getEnrollment(enrollmentId);
     }
 
-
+    @GetMapping("/myEnrollmrnt")
+    public List<Enrollment> getMyEnrollments() {
+        System.out.println("Calling getMyEnrollments ==> ");
+        return enrollmentService.getMyEnrollments();
+    }
     
     
 }
