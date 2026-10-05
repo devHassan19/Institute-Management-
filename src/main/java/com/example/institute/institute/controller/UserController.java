@@ -30,4 +30,16 @@ public class UserController {
     public ResponseEntity<String> verify(@RequestParam String token){
         return userService.verifyUser(token);
     }
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.ok("User deactivated successfully");
+    }
+
+    @PutMapping("/users/{id}/reactivate")
+    public ResponseEntity<String> reactivateUser(@PathVariable Long id) {
+        userService.reactivateUser(id);
+        return ResponseEntity.ok("User reactivated successfully");
+    }
 }
