@@ -114,12 +114,13 @@ public class EnrollmentService {
 
         Enrollment enrollment = getEnrollment(enrollmentId);
         auditLogService.createLog(userId, "DELETE", "Enrollment",
-                enrollment.getId(), "DELETE Enrollment To: " + enrollment.getStudent().getName() + "From Class: " + enrollment.getAClass().getName());
+                enrollment.getId(), "DELETE Enrollment To Student: " + enrollment.getStudent().getName() + ", From Class: " + enrollment.getAClass().getName());
         enrollmrntRepository.delete(enrollment);
     }
 
     public void deleteMyEnrollment(Long enrollmentId) {
         User currentUser = getCurrentLogginUser();
+        Long userId = currentUser.getId();
         if (currentUser.getUserStatus() != UserStatus.ACTIVE) {
             throw new ForbiddenException("Your account has been deactivated");
         }
@@ -135,6 +136,8 @@ public class EnrollmentService {
         if (!enrollment.getStudent().getId().equals(student.getId())) {
             throw new ForbiddenException("You can only delete your own enrollment");
         }
+        auditLogService.createLog(userId, "DELETE", "Enrollment",
+                enrollment.getId(), "DELETE Enrollment To Student: " + enrollment.getStudent().getName() + ", From Class: " + enrollment.getAClass().getName());
         enrollmrntRepository.delete(enrollment);
     }
 }
