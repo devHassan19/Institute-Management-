@@ -67,6 +67,7 @@ public class InstructorService {
     public Instructor updateInstructor(Long insInstructorId, Instructor instructorObject) {
         System.out.println("Service Calling updateInstructor ==> ");
         User currentUser = getCurrentLogginUser();
+        Long userId = currentUser.getId();
         if (!"ADMIN".equals(currentUser.getRole())) {
             throw new ForbiddenException("Only admin can update a instructor");
         }
@@ -84,7 +85,12 @@ public class InstructorService {
         instructor.setName(instructorObject.getName());
         instructor.setEmail(instructorObject.getEmail());
         instructor.setPhone(instructorObject.getPhone());
-        return instructorRepository.save(instructor);
+
+        Instructor savedInstructor = instructorRepository.save(instructor);
+        auditLogService.createLog(userId, "UPDATE", "Instructor",
+                savedInstructor.getId(), "UPDATE Instructor: " + savedInstructor.getName());
+
+        return savedInstructor;
     }
 
     public void deleteInstructor(Long instructorId) {
