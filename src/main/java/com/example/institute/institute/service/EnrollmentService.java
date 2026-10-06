@@ -24,6 +24,7 @@ public class EnrollmentService {
     @Autowired
     private StudentRepository studentRepository;
     private ClassRepository classRepository;
+    private AuditLogService auditLogService;
 
     public static User getCurrentLogginUser() {
         MyUserDetails myUserDetails = (MyUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -32,6 +33,7 @@ public class EnrollmentService {
 
     public Enrollment createIEnrollment(Enrollment enrollment) {
         User currentUser = getCurrentLogginUser();
+        Long userId = currentUser.getId();
         if (currentUser.getUserStatus() != UserStatus.ACTIVE) {
             throw new ForbiddenException("Your account has been deactivated");
         }
@@ -59,7 +61,11 @@ public class EnrollmentService {
 
         enrollment.setStudent(student);
         enrollment.setAClass(aclass);
-        return enrollmrntRepository.save(enrollment);
+
+        Enrollment savedEnrollment = enrollmrntRepository.save(enrollment);
+        auditLogService.createLog(userId, "REGISTRATION", "Enrollment",
+                savedEnrollment.getId(), "Join Student: " + student.getName() + " With Class: " + aclass.getName());
+        return savedEnrollment;
     }
 
     public List<Enrollment> getEnrollments() {
@@ -100,12 +106,15 @@ public class EnrollmentService {
 
     public void deleteEnrollment(Long enrollmentId) {
         User currentUser = getCurrentLogginUser();
+        Long userId = currentUser.getId();
         System.out.println("Service Calling deleteEnrollment ==> ");
         if (!"ADMIN".equals(currentUser.getRole())) {
             throw new ForbiddenException("Only admin can Delete a Enrollment");
         }
 
         Enrollment enrollment = getEnrollment(enrollmentId);
+        auditLogService.createLog(userId, "DELETE", "Enrollment",
+                enrollment.getId(), "DELETE Enrollment To: " + enrollment.getStudent().getName() + "From Class: " + enrollment.getAClass().getName());
         enrollmrntRepository.delete(enrollment);
     }
 
