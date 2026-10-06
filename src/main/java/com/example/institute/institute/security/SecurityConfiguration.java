@@ -38,7 +38,10 @@ public class SecurityConfiguration {
                                 "/auth/users",
                                 "/auth/users/login",
                                 "/auth/users/register",
-                                "/auth/users/verify"
+                                "/auth/users/verify",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**"
                         ).permitAll()
                         .anyRequest().authenticated());
         http.addFilterBefore(authenticationJwtRequestFilter(),
