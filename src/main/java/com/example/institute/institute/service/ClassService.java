@@ -131,11 +131,16 @@ public class ClassService {
         System.out.println("Service Calling deleteClass ==> ");
 
         User currentUser = getCurrentLogginUser();
+        Long userId = currentUser.getId();
         if (!"ADMIN".equals(currentUser.getRole())) {
             throw new ForbiddenException("Only admin can Delete a Instructor");
         }
 
         Class existingClass = getClass(classId);
+
+        auditLogService.createLog(userId, "DELETE", "Class",
+                existingClass.getId(), "DELETE Class: " + existingClass.getName());
+
         classRepository.delete(existingClass);
     }
 }
