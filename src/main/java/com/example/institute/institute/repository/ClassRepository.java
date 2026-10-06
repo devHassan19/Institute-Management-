@@ -9,4 +9,6 @@ public interface ClassRepository extends JpaRepository<Class,Long> {
     Class findById(long id);
     Class findByName(String name);
     List<Class> findByNameContainingIgnoreCase(String name);
+    List<Class> findByCourseId(Long courseId);
+
 }

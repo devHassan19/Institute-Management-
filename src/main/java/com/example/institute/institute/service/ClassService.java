@@ -147,4 +147,9 @@ public class ClassService {
         System.out.println("Service Calling searchClasses ==> ");
         return classRepository.findByNameContainingIgnoreCase(name);
     }
+
+    public List<Class> filterByCourse(Long courseId) {
+        System.out.println("Service Calling filterByCourse ==> ");
+        return classRepository.findByCourseId(courseId);
+    }
 }
