@@ -30,6 +30,8 @@ public class ClassService {
     @Autowired
     private InstructorRepository instructorRepository;
 
+    private AuditLogService auditLogService;
+
     public static User getCurrentLogginUser() {
         MyUserDetails myUserDetails = (MyUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return myUserDetails.getUser();
@@ -38,6 +40,7 @@ public class ClassService {
     public Class createClass(Class classObject) {
         User currentUser = getCurrentLogginUser();
         String role = currentUser.getRole();
+        Long userId = currentUser.getId();
         System.out.println("Service Calling createClass ==> ");
 
         if (!"ADMIN".equals(role)) {
@@ -71,7 +74,12 @@ public class ClassService {
         classObject.setCourse(course);
         classObject.setInstructor(instructor);
 
-        return classRepository.save(classObject);
+        Class savedClass = classRepository.save(classObject);
+
+        auditLogService.createLog(userId, "CREATE", "Class",
+                savedClass.getId(), "Created course: " + savedClass.getName());
+
+        return savedClass;
     }
 
     public List<Class> getClasses() {
