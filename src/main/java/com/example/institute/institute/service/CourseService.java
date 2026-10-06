@@ -47,15 +47,10 @@ public class CourseService {
         if (courseRepository.findByName(course.getName()) != null) {
             throw new InformationExistException("Course already exists");
         }
-        Course savedCourse = courseRepository.save(course);
 
-        auditLogService.createLog(
-                userId,
-                "CREATE",
-                "Course",
-                savedCourse.getId(),
-                "Created course: " + course.getName()
-        );
+        Course savedCourse = courseRepository.save(course);
+        auditLogService.createLog(userId, "CREATE", "Course",
+                savedCourse.getId(), "Created course: " + course.getName());
         return savedCourse;
     }
 
@@ -100,14 +95,8 @@ public class CourseService {
         course.setDescription(courseObject.getDescription());
 
         Course savedCourse = courseRepository.save(course);
-
-        auditLogService.createLog(
-                userId,
-                "UPDATE",
-                "Course",
-                savedCourse.getId(),
-                "UPDATE course: " + course.getName()
-        );
+        auditLogService.createLog(userId, "UPDATE", "Course",
+                savedCourse.getId(), "UPDATE course: " + course.getName());
         return savedCourse;
     }
 
@@ -116,11 +105,14 @@ public class CourseService {
 
         // 403: مو أدمن
         User currentUser = getCurrentLogginUser();
+        Long userId = currentUser.getId();
         if (!"ADMIN".equals(currentUser.getRole())) {
             throw new ForbiddenException("Only admin can delete a course");
         }
 
         Course course = getCourse(courseId);
+        auditLogService.createLog(userId, "DELETE", "Course",
+                course.getId(), "DELETE course: " + course.getName());
         courseRepository.delete(course);
     }
 }
