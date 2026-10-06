@@ -97,6 +97,7 @@ public class ClassService {
     public Class updateClass(Long classId, Class classObject) {
         System.out.println("Service Calling updateClass ==> ");
         User currentUser = getCurrentLogginUser();
+        Long userId = currentUser.getId();
         if (!"ADMIN".equals(currentUser.getRole())) {
             throw new ForbiddenException("Only admin can update a instructor");
         }
@@ -117,7 +118,13 @@ public class ClassService {
         existingClass.setStartDate(classObject.getStartDate());
         existingClass.setEndDate(classObject.getEndDate());
         existingClass.setCapacity(classObject.getCapacity());
-        return classRepository.save(classObject);
+
+        Class savedClass = classRepository.save(classObject);
+
+        auditLogService.createLog(userId, "UPDATE", "Class",
+                savedClass.getId(), "UPDATE Class: " + savedClass.getName());
+
+        return savedClass;
     }
 
     public void deleteClass(Long classId) {
