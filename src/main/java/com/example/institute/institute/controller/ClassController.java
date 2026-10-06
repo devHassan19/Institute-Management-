@@ -3,6 +3,7 @@ package com.example.institute.institute.controller;
 import com.example.institute.institute.model.Class;
 import com.example.institute.institute.service.ClassService;
 import lombok.*;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +37,19 @@ public class ClassController {
             return ResponseEntity.ok(classService.filterByCourse(courseId));
         }
         return ResponseEntity.ok(classService.getClasses());
+    }
+
+    @GetMapping("/classesSort")
+    public List<Class> getAllClasses(
+            @RequestParam(defaultValue = "id,asc") String sort) {
+
+        String[] sortParams = sort.split(",");
+
+        Sort.Direction direction = Sort.Direction.fromString(sortParams[1]);
+
+        Sort sorting = Sort.by(direction, sortParams[0]);
+
+        return classService.getAllClasses(sorting);
     }
 
     @GetMapping("/classes/{classId}")
