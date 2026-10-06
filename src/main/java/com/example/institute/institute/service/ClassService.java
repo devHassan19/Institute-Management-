@@ -65,11 +65,11 @@ public class ClassService {
 
         Course course = courseRepository.findById(classObject.getCourse()
                 .getId()).orElseThrow(() ->
-                        new InformationNotFoundException("Course not found"));
+                new InformationNotFoundException("Course not found"));
 
         Instructor instructor = instructorRepository.findById(classObject.getInstructor()
                 .getId()).orElseThrow(() ->
-                        new InformationNotFoundException("Instructor not found"));
+                new InformationNotFoundException("Instructor not found"));
 
         classObject.setCourse(course);
         classObject.setInstructor(instructor);
@@ -140,5 +140,11 @@ public class ClassService {
                 existingClass.getId(), "DELETE Class: " + existingClass.getName());
 
         classRepository.delete(existingClass);
+    }
+
+    //    Search / Filtering
+    public List<Class> searchClasses(String name) {
+        System.out.println("Service Calling searchClasses ==> ");
+        return classRepository.findByNameContainingIgnoreCase(name);
     }
 }

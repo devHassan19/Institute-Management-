@@ -24,8 +24,12 @@ public class ClassController {
     }
 
     @GetMapping("/classes")
-    public ResponseEntity<List<Class>> getAllClasses() {
+    public ResponseEntity<List<Class>> getAllClasses(@RequestParam(required = false) String name) {
         System.out.println("Calling getAllClasses ==> ");
+
+        if (name != null && !name.isBlank()) {
+            return ResponseEntity.ok(classService.searchClasses(name));
+        }
         return ResponseEntity.ok(classService.getClasses());
     }
 
