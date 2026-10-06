@@ -3,6 +3,7 @@ package com.example.institute.institute.controller;
 import com.example.institute.institute.model.Class;
 import com.example.institute.institute.service.ClassService;
 import lombok.*;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,16 +41,19 @@ public class ClassController {
     }
 
     @GetMapping("/classesSort")
-    public List<Class> getAllClasses(
-            @RequestParam(defaultValue = "id,asc") String sort) {
-
+    public List<Class> getAllClasses(@RequestParam(defaultValue = "id,asc") String sort) {
         String[] sortParams = sort.split(",");
-
         Sort.Direction direction = Sort.Direction.fromString(sortParams[1]);
-
         Sort sorting = Sort.by(direction, sortParams[0]);
-
         return classService.getAllClasses(sorting);
+    }
+
+    @GetMapping("/classes/pagination")
+    public Page<Class> getClassesByPage(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        return classService.getClassesByPage(page, size);
     }
 
     @GetMapping("/classes/{classId}")
