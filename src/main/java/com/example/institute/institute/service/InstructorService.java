@@ -4,6 +4,7 @@ import com.example.institute.institute.exception.BadRequestException;
 import com.example.institute.institute.exception.ForbiddenException;
 import com.example.institute.institute.exception.InformationExistException;
 import com.example.institute.institute.exception.InformationNotFoundException;
+import com.example.institute.institute.model.Class;
 import com.example.institute.institute.model.Instructor;
 import com.example.institute.institute.model.User;
 import com.example.institute.institute.repository.InstructorRepository;
@@ -19,6 +20,7 @@ import java.util.List;
 public class InstructorService {
 
     private InstructorRepository instructorRepository;
+    private AuditLogService auditLogService;
 
     public static User getCurrentLogginUser() {
         MyUserDetails myUserDetails = (MyUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -28,6 +30,7 @@ public class InstructorService {
     public Instructor createInstructor(Instructor instructor) {
         User currentUser = getCurrentLogginUser();
         String role = currentUser.getRole();
+        Long userId = currentUser.getId();
         System.out.println("Service Calling createInstructor ==> ");
 
         if (!"ADMIN".equals(role)) {
@@ -42,7 +45,11 @@ public class InstructorService {
             throw new InformationExistException("Instructor already exists");
         }
 
-        return instructorRepository.save(instructor);
+        Instructor savedInstructor = instructorRepository.save(instructor);
+        auditLogService.createLog(userId, "CREATE", "Instructor",
+                savedInstructor.getId(), "Created Instructor: " + savedInstructor.getName());
+
+        return savedInstructor;
     }
 
     public List<Instructor> getInstructors() {

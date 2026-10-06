@@ -75,10 +75,8 @@ public class ClassService {
         classObject.setInstructor(instructor);
 
         Class savedClass = classRepository.save(classObject);
-
         auditLogService.createLog(userId, "CREATE", "Class",
                 savedClass.getId(), "Created course: " + savedClass.getName());
-
         return savedClass;
     }
 
