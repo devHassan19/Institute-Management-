@@ -1,6 +1,7 @@
 package com.example.institute.institute.controller;
 
 import com.example.institute.institute.model.User;
+import com.example.institute.institute.model.request.ChangePasswordRequest;
 import com.example.institute.institute.model.request.LoginRequest;
 import com.example.institute.institute.service.UserService;
 import lombok.AllArgsConstructor;
@@ -40,5 +41,14 @@ public class UserController {
     public ResponseEntity<String> reactivateUser(@PathVariable Long id) {
         userService.reactivateUser(id);
         return ResponseEntity.ok("User reactivated successfully");
+    }
+
+    @PutMapping("/users/change-password")
+    public ResponseEntity<String> changePassword(
+            @RequestBody ChangePasswordRequest request) {
+
+        userService.changePassword(request);
+
+        return ResponseEntity.ok("Password changed successfully");
     }
 }

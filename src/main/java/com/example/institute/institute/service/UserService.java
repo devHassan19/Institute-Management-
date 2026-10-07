@@ -5,6 +5,7 @@ import com.example.institute.institute.exception.InformationExistException;
 import com.example.institute.institute.model.Student;
 import com.example.institute.institute.model.User;
 import com.example.institute.institute.model.VerificationToken;
+import com.example.institute.institute.model.request.ChangePasswordRequest;
 import com.example.institute.institute.model.request.LoginRequest;
 import com.example.institute.institute.model.response.LoginResponse;
 import com.example.institute.institute.repository.UserRepository;
@@ -151,5 +152,27 @@ public class UserService {
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         user.setUserStatus(UserStatus.ACTIVE);
         userRepository.save(user);
+    }
+
+    @Transactional
+    public void changePassword(ChangePasswordRequest request) {
+
+        User currentUser = StudentService.getCurrentLogginUser();
+
+        if (!passwordEncoder.matches(
+                request.getOldPassword(),
+                currentUser.getPassword())) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Old password is incorrect"
+            );
+        }
+
+        currentUser.setPassword(
+                passwordEncoder.encode(request.getNewPassword())
+        );
+
+        userRepository.save(currentUser);
     }
 }
