@@ -4,40 +4,65 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 public class NotificationService {
 
-    private List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
+    private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
 
-    public SseEmitter subscribe() {
+    public SseEmitter subscribe(Long userId) {
+
+        System.out.println("CREATING SSE CONNECTION FOR USER: " + userId);
 
         SseEmitter emitter = new SseEmitter(0L);
 
-        emitters.add(emitter);
+        emitters.put(userId, emitter);
 
-        emitter.onCompletion(() -> emitters.remove(emitter));
-        emitter.onTimeout(() -> emitters.remove(emitter));
-        emitter.onError(error -> emitters.remove(emitter));
+        System.out.println("CONNECTED USER: " + userId);
+        System.out.println("CONNECTED CLIENTS: " + emitters.size());
+
+        emitter.onCompletion(() -> {
+            emitters.remove(userId);
+            System.out.println("SSE COMPLETED FOR USER: " + userId);
+        });
+
+        emitter.onTimeout(() -> {
+            emitters.remove(userId);
+            System.out.println("SSE TIMEOUT FOR USER: " + userId);
+        });
+
+        emitter.onError(error -> {
+            emitters.remove(userId);
+            System.out.println("SSE ERROR FOR USER: " + userId);
+        });
 
         return emitter;
     }
 
-    public void sendNotification(String message) {
+    public void sendNotification(Long userId, String message) {
 
-        for (SseEmitter emitter : emitters) {
+        SseEmitter emitter = emitters.get(userId);
 
-            try {
-                emitter.send(
-                        SseEmitter.event()
-                                .name("notification")
-                                .data(message)
-                );
+        if (emitter == null) {
+            System.out.println("USER " + userId + " IS NOT CONNECTED");
+            return;
+        }
 
-            } catch (Exception e) {
-                emitters.remove(emitter);
-            }
+        try {
+            emitter.send(
+                    SseEmitter.event()
+                            .name("notification")
+                            .data(message)
+            );
+
+            System.out.println("NOTIFICATION SENT TO USER: " + userId);
+
+        } catch (Exception e) {
+            emitters.remove(userId);
+            System.out.println("FAILED TO SEND NOTIFICATION TO USER: " + userId);
         }
     }
 }

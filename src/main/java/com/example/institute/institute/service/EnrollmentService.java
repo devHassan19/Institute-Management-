@@ -9,6 +9,7 @@ import com.example.institute.institute.model.Class;
 import com.example.institute.institute.repository.ClassRepository;
 import com.example.institute.institute.repository.EnrollmrntRepository;
 import com.example.institute.institute.repository.StudentRepository;
+import com.example.institute.institute.repository.UserRepository;
 import com.example.institute.institute.security.MyUserDetails;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,8 @@ public class EnrollmentService {
     private StudentRepository studentRepository;
     private ClassRepository classRepository;
     private AuditLogService auditLogService;
+    private UserRepository userRepository;
+    private NotificationService notificationService;
 
     public static User getCurrentLogginUser() {
         MyUserDetails myUserDetails = (MyUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -63,6 +66,20 @@ public class EnrollmentService {
         enrollment.setAClass(aclass);
 
         Enrollment savedEnrollment = enrollmrntRepository.save(enrollment);
+        // Notify Student
+        notificationService.sendNotification(currentUser.getId(),
+                "You enrolled in Class: " + aclass.getName()
+        );
+
+        // Notify Admin
+        List<User> admins = userRepository.findByRole("ADMIN");
+
+        for (User admin : admins) {notificationService.sendNotification(admin.getId(),
+                    "Student " + student.getName()
+                            + " enrolled in Class: " + aclass.getName()
+            );
+        }
+
         auditLogService.createLog(userId, "REGISTRATION", "Enrollment",
                 savedEnrollment.getId(), "Join Student: " + student.getName() + " With Class: " + aclass.getName());
         return savedEnrollment;
