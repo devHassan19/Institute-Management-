@@ -39,6 +39,8 @@ public class SecurityConfiguration {
                                 "/auth/users/login",
                                 "/auth/users/register",
                                 "/auth/users/verify",
+                                "/auth/users/forgot-password",
+                                "/auth/users/reset-password",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**"

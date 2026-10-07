@@ -2,12 +2,12 @@ package com.example.institute.institute.service;
 
 import com.example.institute.institute.exception.ForbiddenException;
 import com.example.institute.institute.exception.InformationExistException;
-import com.example.institute.institute.model.Student;
-import com.example.institute.institute.model.User;
-import com.example.institute.institute.model.VerificationToken;
+import com.example.institute.institute.model.*;
 import com.example.institute.institute.model.request.ChangePasswordRequest;
 import com.example.institute.institute.model.request.LoginRequest;
+import com.example.institute.institute.model.request.ResetPasswordRequest;
 import com.example.institute.institute.model.response.LoginResponse;
+import com.example.institute.institute.repository.PasswordResetTokenRepository;
 import com.example.institute.institute.repository.UserRepository;
 import com.example.institute.institute.repository.VerificationTokenRepository;
 import com.example.institute.institute.security.JWTUtils;
@@ -25,7 +25,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.institute.institute.model.UserStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -39,6 +38,7 @@ public class UserService {
     private final VerificationTokenRepository tokenRepository;
     private final EmailService emailService;
     private MyUserDetails myUserDetails;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     private void checkAdmin() {
         User currentUser = StudentService.getCurrentLogginUser();
@@ -54,7 +54,8 @@ public class UserService {
                        @Lazy AuthenticationManager authenticationManager,
                        @Lazy MyUserDetails myUserDetails,
                        VerificationTokenRepository tokenRepository,
-                       EmailService emailService) {
+                       EmailService emailService,
+                       PasswordResetTokenRepository passwordResetTokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
@@ -62,6 +63,7 @@ public class UserService {
         this.myUserDetails = myUserDetails;
         this.tokenRepository = tokenRepository;
         this.emailService = emailService;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
     @Transactional
@@ -70,6 +72,7 @@ public class UserService {
         if (!userRepository.existsByEmailAddress(userObject.getEmailAddress())) {
             userObject.setPassword(passwordEncoder.encode(userObject.getPassword()));
             userObject.setEnabled(false);
+            userObject.setUserStatus(UserStatus.ACTIVE);
 
             if ("STUDENT".equals(userObject.getRole())) {
                 Student student = new Student();
@@ -174,5 +177,62 @@ public class UserService {
         );
 
         userRepository.save(currentUser);
+    }
+
+    @Transactional
+    public void forgotPassword(String email) {
+
+        User user = userRepository.findByEmailAddress(email);
+
+        if (user == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "User not found"
+            );
+        }
+
+        PasswordResetToken resetToken = new PasswordResetToken(user);
+
+        passwordResetTokenRepository.save(resetToken);
+
+        System.out.println("PASSWORD RESET TOKEN: " + resetToken.getToken());
+
+        emailService.sendPasswordResetEmail(
+                user.getEmailAddress(),
+                resetToken.getToken()
+        );
+    }
+
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+
+        PasswordResetToken resetToken =
+                passwordResetTokenRepository
+                        .findByToken(request.getToken())
+                        .orElseThrow(() ->
+                                new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "Invalid reset token"
+                                ));
+
+        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+
+            passwordResetTokenRepository.delete(resetToken);
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Reset token expired"
+            );
+        }
+
+        User user = resetToken.getUser();
+
+        user.setPassword(
+                passwordEncoder.encode(request.getNewPassword())
+        );
+
+        userRepository.save(user);
+
+        passwordResetTokenRepository.delete(resetToken);
     }
 }

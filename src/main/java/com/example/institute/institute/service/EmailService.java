@@ -23,4 +23,14 @@ public class EmailService {
                 + baseUrl + "/auth/users/verify?token=" + token);
         mailSender.send(msg);
     }
+
+    public void sendPasswordResetEmail(String to, String token) {
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setTo(to);
+        msg.setSubject("Reset your password");
+        msg.setText("Click the link to reset your password:\n"
+                + baseUrl + "/auth/users/reset-password?token=" + token);
+
+        mailSender.send(msg);
+    }
 }

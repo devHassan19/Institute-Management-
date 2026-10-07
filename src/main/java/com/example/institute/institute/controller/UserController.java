@@ -2,7 +2,9 @@ package com.example.institute.institute.controller;
 
 import com.example.institute.institute.model.User;
 import com.example.institute.institute.model.request.ChangePasswordRequest;
+import com.example.institute.institute.model.request.ForgotPasswordRequest;
 import com.example.institute.institute.model.request.LoginRequest;
+import com.example.institute.institute.model.request.ResetPasswordRequest;
 import com.example.institute.institute.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -50,5 +52,27 @@ public class UserController {
         userService.changePassword(request);
 
         return ResponseEntity.ok("Password changed successfully");
+    }
+
+    @PostMapping("/users/forgot-password")
+    public ResponseEntity<String> forgotPassword(
+            @RequestBody ForgotPasswordRequest request) {
+
+        userService.forgotPassword(request.getEmail());
+
+        return ResponseEntity.ok(
+                "Password reset email sent successfully"
+        );
+    }
+
+    @PostMapping("/users/reset-password")
+    public ResponseEntity<String> resetPassword(
+            @RequestBody ResetPasswordRequest request) {
+
+        userService.resetPassword(request);
+
+        return ResponseEntity.ok(
+                "Password reset successfully"
+        );
     }
 }
