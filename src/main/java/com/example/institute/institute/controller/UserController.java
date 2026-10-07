@@ -43,7 +43,7 @@ public class UserController {
         return ResponseEntity.ok("User reactivated successfully");
     }
 
-    @PutMapping("/users/change-password")
+    @PutMapping("/users/changePassword")
     public ResponseEntity<String> changePassword(
             @RequestBody ChangePasswordRequest request) {
 
