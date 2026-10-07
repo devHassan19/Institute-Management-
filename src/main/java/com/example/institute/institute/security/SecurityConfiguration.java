@@ -18,11 +18,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfiguration {
     private MyUserDetailsService userDetailsService;
+    private final JwtRequestFilter jwtRequestFilter;
+    private final RateLimitFilter rateLimitFilter;
 
-    @Bean
-    public JwtRequestFilter authenticationJwtRequestFilter() {
-        return new JwtRequestFilter();
-    }
+//    @Bean
+//    public JwtRequestFilter authenticationJwtRequestFilter() {
+//        return new JwtRequestFilter();
+//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -46,8 +48,15 @@ public class SecurityConfiguration {
                                 "/v3/api-docs/**"
                         ).permitAll()
                         .anyRequest().authenticated());
-        http.addFilterBefore(authenticationJwtRequestFilter(),
-                UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(
+                rateLimitFilter,
+                UsernamePasswordAuthenticationFilter.class
+        );
+
+        http.addFilterBefore(
+                jwtRequestFilter,
+                UsernamePasswordAuthenticationFilter.class
+        );
         return http.build();
     }
 
