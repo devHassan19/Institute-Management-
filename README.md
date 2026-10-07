@@ -219,11 +219,11 @@ The main entities include:
 * Enrollment
 * AuditLog
 
-**ERD:**
+---
 
-```text
-ERD.png
-```
+## ERD
+
+![Institute Management System ERD](docs/ERD.png)
 
 ---
 
@@ -239,8 +239,6 @@ The planning documentation includes:
 * Progress tracking
 * Feature implementation
 
-**GitHub Project / Planning:**
-https://github.com/devHassan19/Institute-Management-.git
 ---
 
 ## API Documentation
