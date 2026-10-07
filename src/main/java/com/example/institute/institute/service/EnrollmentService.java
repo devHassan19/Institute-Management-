@@ -150,8 +150,22 @@ public class EnrollmentService {
                 new InformationNotFoundException(
                         "Enrollment with id " + enrollmentId + " not found"));
 
+
         if (!enrollment.getStudent().getId().equals(student.getId())) {
             throw new ForbiddenException("You can only delete your own enrollment");
+        }
+
+        notificationService.sendNotification(currentUser.getId(),
+                "You Drop of Class: " + enrollmentId.getClass().getName()
+        );
+
+        // Notify Admin
+        List<User> admins = userRepository.findByRole("ADMIN");
+
+        for (User admin : admins) {notificationService.sendNotification(admin.getId(),
+                "Student " + student.getName()
+                        + " Drop of Class: " + enrollmentId.getClass().getName()
+        );
         }
         auditLogService.createLog(userId, "DELETE", "Enrollment",
                 enrollment.getId(), "DELETE Enrollment To Student: " + enrollment.getStudent().getName() + ", From Class: " + enrollment.getAClass().getName());
