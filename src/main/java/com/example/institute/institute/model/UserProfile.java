@@ -28,6 +28,9 @@ public class UserProfile {
     @Column
     private String mobileNumber;
 
+    @Column
+    private String image;
+
     @JsonIgnore
     @OneToOne(mappedBy = "userProfile", fetch = FetchType.LAZY)
     private User user;

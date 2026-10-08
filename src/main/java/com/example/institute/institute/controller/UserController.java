@@ -1,14 +1,17 @@
 package com.example.institute.institute.controller;
 
 import com.example.institute.institute.model.User;
+import com.example.institute.institute.model.UserProfile;
 import com.example.institute.institute.model.request.ChangePasswordRequest;
 import com.example.institute.institute.model.request.ForgotPasswordRequest;
 import com.example.institute.institute.model.request.LoginRequest;
 import com.example.institute.institute.model.request.ResetPasswordRequest;
 import com.example.institute.institute.service.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @AllArgsConstructor
@@ -16,20 +19,71 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private UserService userService;
 
-    @PostMapping("/users/register")
-    public User register(@RequestBody User user){
+//    @PostMapping("/users/register")
+//    public User register(@RequestBody User user){
+//        System.out.println("Calling createUser ==>");
+//        return userService.createUser(user);
+//    }
+
+//    @PostMapping(value = "/users/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    public User register(@RequestPart("user") User user, @RequestPart(value = "image",
+//            required = false) MultipartFile image
+//    ) {
+//        System.out.println("Calling createUser ==>");
+//        return userService.createUser(user, image);
+//    }
+
+    @PostMapping(
+            value = "/users/register",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public User register(
+            @RequestParam String username,
+            @RequestParam String emailAddress,
+            @RequestParam String password,
+            @RequestParam(required = false) String role,
+            @RequestParam String firstName,
+            @RequestParam String lastName,
+            @RequestParam String mobileNumber,
+            @RequestPart(value = "image", required = false) MultipartFile image
+    ) {
+
         System.out.println("Calling createUser ==>");
-        return userService.createUser(user);
+
+        User user = new User();
+
+        user.setUsername(username);
+        user.setEmailAddress(emailAddress);
+        user.setPassword(password);
+
+        // Default role
+        if (role == null || role.isBlank()) {
+            role = "STUDENT";
+        }
+
+        user.setRole(role);
+
+        UserProfile profile = new UserProfile();
+
+        profile.setFirstName(firstName);
+        profile.setLastName(lastName);
+        profile.setMobileNumber(mobileNumber);
+
+        user.setUserProfile(profile);
+
+        return userService.createUser(user, image);
     }
 
+
+
     @PostMapping("/users/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest){
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
         System.out.println("Calling loginUser ==>");
         return userService.loginUser(loginRequest);
     }
 
     @GetMapping("/users/verify")
-    public ResponseEntity<String> verify(@RequestParam String token){
+    public ResponseEntity<String> verify(@RequestParam String token) {
         return userService.verifyUser(token);
     }
 
@@ -74,5 +128,11 @@ public class UserController {
         return ResponseEntity.ok(
                 "Password reset successfully"
         );
+    }
+
+    @PostMapping(value = "/users", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public User createUser(@RequestPart("user") User userObject,
+                           @RequestPart(value = "image", required = false) MultipartFile image) {
+        return userService.createUser(userObject, image);
     }
 }

@@ -25,9 +25,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -44,6 +51,53 @@ public class UserService {
         User currentUser = StudentService.getCurrentLogginUser();
         if (!"ADMIN".equals(currentUser.getRole())) {
             throw new ForbiddenException("Only admin can perform this action");
+        }
+    }
+
+    private final String UPLOAD_DIR = "uploads/profiles/";
+
+    private String saveImage(MultipartFile image) {
+
+        try {
+
+            Path uploadPath = Paths.get(UPLOAD_DIR);
+
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            String originalFileName = image.getOriginalFilename();
+
+            String extension = "";
+
+            if (originalFileName != null &&
+                    originalFileName.contains(".")) {
+
+                extension = originalFileName.substring(
+                        originalFileName.lastIndexOf(".")
+                );
+            }
+
+            String fileName = UUID.randomUUID() + extension;
+
+            Path filePath = uploadPath.resolve(fileName);
+
+            Files.copy(
+                    image.getInputStream(),
+                    filePath,
+                    StandardCopyOption.REPLACE_EXISTING
+            );
+
+            System.out.println("Image saved: " + filePath);
+
+            return UPLOAD_DIR + fileName;
+
+        } catch (IOException e) {
+
+            throw new RuntimeException(
+                    "Could not save image",
+                    e
+            );
         }
     }
 
@@ -67,12 +121,26 @@ public class UserService {
     }
 
     @Transactional
-    public User createUser(User userObject) {
+    public User createUser(User userObject, MultipartFile image) {
+
         System.out.println("Calling createUser ==>");
+
         if (!userRepository.existsByEmailAddress(userObject.getEmailAddress())) {
-            userObject.setPassword(passwordEncoder.encode(userObject.getPassword()));
+
+            userObject.setPassword(
+                    passwordEncoder.encode(userObject.getPassword())
+            );
+
             userObject.setEnabled(false);
             userObject.setUserStatus(UserStatus.ACTIVE);
+
+            if (image != null && !image.isEmpty()) {
+                String imagePath = saveImage(image);
+
+                if (userObject.getUserProfile() != null) {
+                    userObject.getUserProfile().setImage(imagePath);
+                }
+            }
 
             if ("STUDENT".equals(userObject.getRole())) {
                 Student student = new Student();
@@ -83,10 +151,16 @@ public class UserService {
             }
 
             User saved = userRepository.save(userObject);
+
             VerificationToken token = new VerificationToken(saved);
 
             tokenRepository.save(token);
-            emailService.sendVerificationEmail(saved.getEmailAddress(), token.getToken());
+
+            emailService.sendVerificationEmail(
+                    saved.getEmailAddress(),
+                    token.getToken()
+            );
+
             return saved;
 
         } else {
