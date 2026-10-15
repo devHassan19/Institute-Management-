@@ -309,4 +309,22 @@ public class UserService {
 
         passwordResetTokenRepository.delete(resetToken);
     }
+
+    @Transactional
+    public void updateProfile(String firstName, String lastName,
+                              String mobileNumber, MultipartFile image) {
+        User user = StudentService.getCurrentLogginUser();
+        UserProfile profile = user.getUserProfile();
+        if (profile == null) {
+            profile = new UserProfile();
+            user.setUserProfile(profile);
+        }
+        profile.setFirstName(firstName);
+        profile.setLastName(lastName);
+        profile.setMobileNumber(mobileNumber);
+        if (image != null && !image.isEmpty()) {
+            profile.setImage(saveImage(image));
+        }
+        userRepository.save(user);
+    }
 }

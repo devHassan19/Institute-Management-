@@ -45,6 +45,7 @@ public class SecurityConfiguration {
                                 "/auth/users/reset-password",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
+                                "/uploads/**",
                                 "/v3/api-docs/**"
                         ).permitAll()
                         .anyRequest().authenticated());
