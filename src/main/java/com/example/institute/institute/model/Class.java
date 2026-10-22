@@ -3,6 +3,7 @@ package com.example.institute.institute.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Set;
@@ -25,6 +26,9 @@ public class Class {
 
     @Column
     private Integer capacity;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal fee;
 
     @Column
     private LocalDate startDate;

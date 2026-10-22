@@ -21,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -53,6 +54,10 @@ public class ClassService {
 
         if (classObject.getName() == null || classObject.getName().isBlank()) {
             throw new BadRequestException("Class name is required");
+        }
+
+        if (classObject.getFee() == null || classObject.getFee().compareTo(BigDecimal.ZERO) < 0) {
+            throw new BadRequestException("Class fee is required");
         }
 
         if (classRepository.findByName(classObject.getName()) != null) {
@@ -111,7 +116,7 @@ public class ClassService {
         }
 
         Class existing = classRepository.findByName(classObject.getName());
-        if (existing != null && existing.getName().equals(classObject.getName())) {
+        if (existing != null && !existing.getId().equals(classId)) {
             throw new InformationExistException("Class already exists");
         }
 
@@ -120,8 +125,11 @@ public class ClassService {
         existingClass.setStartDate(classObject.getStartDate());
         existingClass.setEndDate(classObject.getEndDate());
         existingClass.setCapacity(classObject.getCapacity());
+        if (classObject.getFee() != null) {
+            existingClass.setFee(classObject.getFee());
+        }
 
-        Class savedClass = classRepository.save(classObject);
+        Class savedClass = classRepository.save(existingClass);
 
         auditLogService.createLog(userId, "UPDATE", "Class",
                 savedClass.getId(), "UPDATE Class: " + savedClass.getName());
