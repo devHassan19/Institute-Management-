@@ -17,14 +17,11 @@ public class NotificationController {
 
     private NotificationService notificationService;
 
-    @GetMapping(
-            value = "/notifications/subscribe",
+    @GetMapping(value = "/notifications/subscribe",
             produces = MediaType.TEXT_EVENT_STREAM_VALUE
     )
     public SseEmitter subscribe() {
-
         User currentUser = EnrollmentService.getCurrentLogginUser();
-
         return notificationService.subscribe(currentUser.getId());
     }
 }

@@ -27,6 +27,7 @@ public class ReservationService {
     private final EnrollmrntRepository enrollmrntRepository;
     private final ClassRepository classRepository;
     private final StudentRepository studentRepository;
+    private final NotificationService notificationService;
 
 
     @Value("${institute.reservation-minutes:10}")
@@ -74,6 +75,9 @@ public class ReservationService {
             reservation.setReservedAt(now);
             reservation.setExpiresAt(now.plusMinutes(holdMinutes));
             reservationRepository.save(reservation);
+            notificationService.sendNotification(student.getUser().getId(),
+                    "Your seat has been reserved successfully."
+            );
             return new ReservationResponse("HELD", reservation.getId(), reservation.getExpiresAt(), null,
                     "Seat held for " + holdMinutes + " minutes. Complete payment before it expires.");
         }
@@ -89,6 +93,9 @@ public class ReservationService {
         waitlistRepository.save(entry);
 
         int position = waitlistRepository.findQueue(classId, WaitlistStatus.WAITING).size();
+        notificationService.sendNotification(student.getUser().getId(),
+                "The class is full. You have been added to the waiting list. Your position is: " + position
+        );
         return new ReservationResponse("WAITLISTED", null, null, position,
                 "Class is full. You are number " + position + " on the waiting list.");
     }
