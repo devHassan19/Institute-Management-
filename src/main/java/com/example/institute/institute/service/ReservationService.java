@@ -11,6 +11,7 @@ import com.example.institute.institute.repository.EnrollmrntRepository;
 import com.example.institute.institute.repository.SeatReservationRepository;
 import com.example.institute.institute.repository.StudentRepository;
 import com.example.institute.institute.repository.WaitlistEntryRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class ReservationService {
     @Value("${institute.reservation-minutes:10}")
     private long holdMinutes;
 
+    @Transactional
     public ReservationResponse reserve(Long classId) {
         User user = EnrollmentService.getCurrentLogginUser();
         if (user.getUserStatus() != UserStatus.ACTIVE) {
@@ -43,10 +45,11 @@ public class ReservationService {
         return reserveSeat(student.getId(), classId);
     }
 
+    @Transactional
     public ReservationResponse reserveSeat(Long studentId, Long classId) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new InformationNotFoundException("Student not found"));
-        Class aClass = classRepository.findById(classId)
+        Class aClass = classRepository.findWithLockById(classId)
                 .orElseThrow(() -> new InformationNotFoundException("Class not found"));
 
         boolean alreadyEnrolled = enrollmrntRepository.findByStudent(student).stream()
