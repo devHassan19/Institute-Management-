@@ -101,14 +101,13 @@ public class ReservationService {
                 "Class is full. You are number " + position + " on the waiting list.");
     }
 
-    // تشتغل من المهمة المجدولة: تلغي الحجوزات المنتهية وتعطي المقعد لأول منتظر
+// Update reservation with clear expire held and give to next waiting list
     @Transactional
     public void expireOverdueReservations() {
         List<SeatReservation> overdue = reservationRepository
                 .findByStatusAndExpiresAtBefore(ReservationStatus.HELD, LocalDateTime.now());
 
         for (SeatReservation candidate : overdue) {
-            // نقفل الحجز ونتأكد إنه لسه HELD (يمكن الطالب دفع بنفس اللحظة)
             SeatReservation r = reservationRepository.findWithLockById(candidate.getId()).orElse(null);
             if (r == null || r.getStatus() != ReservationStatus.HELD
                     || r.getExpiresAt().isAfter(LocalDateTime.now())) {
@@ -120,7 +119,6 @@ public class ReservationService {
             notificationService.sendNotification(r.getStudent().getUser().getId(),
                     "Your reservation for class " + r.getAClass().getName() + " has expired.");
 
-            // لو الطالب جاي من الانتظار وما دفع، نلغي دوره
             for (WaitlistEntry w : waitlistRepository.findEntries(
                     r.getStudent().getId(), r.getAClass().getId(), WaitlistStatus.OFFERED)) {
                 w.setStatus(WaitlistStatus.CANCELLED);
@@ -131,7 +129,7 @@ public class ReservationService {
         }
     }
 
-    // يعطي المقعد لأول واحد في الانتظار (الأقدم)
+// give held to Next first waiting list
     private void promoteNextInQueue(Long classId) {
         Class aClass = classRepository.findWithLockById(classId).orElse(null);
         if (aClass == null) {
