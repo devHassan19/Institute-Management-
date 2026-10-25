@@ -31,14 +31,10 @@ public class NotificationService {
     public SseEmitter subscribe(Long userId) {
 
         System.out.println("CREATING SSE CONNECTION FOR USER: " + userId);
-
         SseEmitter emitter = new SseEmitter(0L);
-
         emitters.put(userId, emitter);
-
         System.out.println("CONNECTED USER: " + userId);
         System.out.println("CONNECTED CLIENTS: " + emitters.size());
-
         emitter.onCompletion(() -> {
             emitters.remove(userId);
             System.out.println("SSE COMPLETED FOR USER: " + userId);
@@ -61,7 +57,6 @@ public class NotificationService {
     public void sendNotification(Long userId, String message) {
         System.out.println("[" + Thread.currentThread().getName() + "] notifying user " + userId);
 
-        // 1) نحفظه في الداتابيس (للطلاب فقط، الأدمن ما عنده Student)
         Student student = studentRepository.findByUser_Id(userId);
         if (student != null) {
             Notification n = new Notification();
@@ -71,22 +66,14 @@ public class NotificationService {
             n.setCreatedAt(LocalDateTime.now());
             notificationRepository.save(n);
         }
-
-        // 2) نرسله فوراً لو متصل (SSE)
         SseEmitter emitter = emitters.get(userId);
-
         if (emitter == null) {
             System.out.println("USER " + userId + " IS NOT CONNECTED");
             return;
         }
 
         try {
-            emitter.send(
-                    SseEmitter.event()
-                            .name("notification")
-                            .data(message)
-            );
-
+            emitter.send(SseEmitter.event().name("notification").data(message));
             System.out.println("NOTIFICATION SENT TO USER: " + userId);
 
         } catch (Exception e) {
