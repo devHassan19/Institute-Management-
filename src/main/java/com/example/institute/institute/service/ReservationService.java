@@ -116,7 +116,7 @@ public class ReservationService {
 
             r.setStatus(ReservationStatus.EXPIRED);
             reservationRepository.save(r);
-            notificationService.sendNotification(r.getStudent().getUser().getId(),
+            notificationService.sendNotification(r.getStudent().getUser ().getId(),
                     "Your reservation for class " + r.getAClass().getName() + " has expired.");
 
             for (WaitlistEntry w : waitlistRepository.findEntries(

@@ -93,7 +93,7 @@ class ReservationConcurrencyTest {
         for (Long studentId : studentIds) {
             Callable<String> task = () -> {
                 ready.countDown();
-                go.await(); // الكل ينتظر الإشارة عشان يبدون بنفس اللحظة
+                go.await();
                 try {
                     ReservationResponse r = reservationService.reserveSeat(studentId, aClass.getId());
                     if ("HELD".equals(r.status())) {
