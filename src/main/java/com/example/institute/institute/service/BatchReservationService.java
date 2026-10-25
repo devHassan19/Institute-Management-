@@ -22,7 +22,6 @@ public class BatchReservationService {
     private final StudentRepository studentRepository;
 
     public List<BatchReservationResult> reserveMany(List<Long> classIds) {
-        // 1) في thread الطلب: نجيب الطالب ونتحقق
         User user = EnrollmentService.getCurrentLogginUser();
         if (user.getUserStatus() != UserStatus.ACTIVE) {
             throw new ForbiddenException("Your account has been deactivated");
@@ -36,7 +35,6 @@ public class BatchReservationService {
         }
         List<Long> ids = classIds.stream().distinct().toList();
 
-        // 2) thread لكل شعبة، والنتايج في Map آمنة للـ threads
         ConcurrentHashMap<Long, BatchReservationResult> results = new ConcurrentHashMap<>();
         List<Thread> threads = new ArrayList<>();
 
@@ -52,10 +50,9 @@ public class BatchReservationService {
             };
             Thread thread = new Thread(task, "reserve-class-" + classId);
             threads.add(thread);
-            thread.start();               // يبدأون كلهم مع بعض
+            thread.start();
         }
 
-        // 3) بعد ما بدأوا كلهم، ننتظرهم يخلصون
         for (Thread thread : threads) {
             try {
                 thread.join();

@@ -24,13 +24,10 @@ public class ReservationGate {
     private final ReservationService reservationService;
     private final StudentRepository studentRepository;
 
-    // الطبقة 1: أقصى عدد حجوزات تشتغل مع بعض (مثل اتصالات الداتابيس)
     private final Semaphore permits = new Semaphore(10);
 
-    // الطبقة 2: قفل لكل شعبة (fair = true: اللي يوصل أول ياخذ دوره أول)
     private final ConcurrentHashMap<Long, ReentrantLock> classLocks = new ConcurrentHashMap<>();
 
-    // يجيب الطالب من التوكن (للـ controller)
     public ReservationResponse reserve(Long classId) {
         User user = EnrollmentService.getCurrentLogginUser();
         if (user.getUserStatus() != UserStatus.ACTIVE) {
@@ -43,7 +40,6 @@ public class ReservationGate {
         return reserveSeat(student.getId(), classId);
     }
 
-    // للـ threads (الـ batch) اللي ما عندها توكن
     public ReservationResponse reserveSeat(Long studentId, Long classId) {
         boolean gotPermit = false;
         ReentrantLock lock = classLocks.computeIfAbsent(classId, id -> new ReentrantLock(true));
@@ -58,7 +54,7 @@ public class ReservationGate {
                 throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Class is busy, try again");
             }
             System.out.println(Thread.currentThread().getName() + " holds lock of class " + classId);
-            return reservationService.reserveSeat(studentId, classId); // فيها @Transactional وقفل الداتابيس
+            return reservationService.reserveSeat(studentId, classId);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Interrupted");
