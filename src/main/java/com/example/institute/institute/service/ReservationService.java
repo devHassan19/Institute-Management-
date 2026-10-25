@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +31,7 @@ public class ReservationService {
     private final NotificationService notificationService;
 
 
-    @Value("${institute.reservation-minutes:10}")
+    @Value("${institute.reservation-minutes:1}")
     private long holdMinutes;
 
     @Transactional
@@ -98,5 +99,70 @@ public class ReservationService {
         );
         return new ReservationResponse("WAITLISTED", null, null, position,
                 "Class is full. You are number " + position + " on the waiting list.");
+    }
+
+    // تشتغل من المهمة المجدولة: تلغي الحجوزات المنتهية وتعطي المقعد لأول منتظر
+    @Transactional
+    public void expireOverdueReservations() {
+        List<SeatReservation> overdue = reservationRepository
+                .findByStatusAndExpiresAtBefore(ReservationStatus.HELD, LocalDateTime.now());
+
+        for (SeatReservation candidate : overdue) {
+            // نقفل الحجز ونتأكد إنه لسه HELD (يمكن الطالب دفع بنفس اللحظة)
+            SeatReservation r = reservationRepository.findWithLockById(candidate.getId()).orElse(null);
+            if (r == null || r.getStatus() != ReservationStatus.HELD
+                    || r.getExpiresAt().isAfter(LocalDateTime.now())) {
+                continue;
+            }
+
+            r.setStatus(ReservationStatus.EXPIRED);
+            reservationRepository.save(r);
+            notificationService.sendNotification(r.getStudent().getUser().getId(),
+                    "Your reservation for class " + r.getAClass().getName() + " has expired.");
+
+            // لو الطالب جاي من الانتظار وما دفع، نلغي دوره
+            for (WaitlistEntry w : waitlistRepository.findEntries(
+                    r.getStudent().getId(), r.getAClass().getId(), WaitlistStatus.OFFERED)) {
+                w.setStatus(WaitlistStatus.CANCELLED);
+                waitlistRepository.save(w);
+            }
+
+            promoteNextInQueue(r.getAClass().getId());
+        }
+    }
+
+    // يعطي المقعد لأول واحد في الانتظار (الأقدم)
+    private void promoteNextInQueue(Long classId) {
+        Class aClass = classRepository.findWithLockById(classId).orElse(null);
+        if (aClass == null) {
+            return;
+        }
+        LocalDateTime now = LocalDateTime.now();
+        long taken = enrollmrntRepository.findByaClass(aClass).size()
+                + reservationRepository.countActiveHolds(classId, ReservationStatus.HELD, now);
+        if (taken >= aClass.getCapacity()) {
+            return;
+        }
+
+        List<WaitlistEntry> queue = waitlistRepository.findQueue(classId, WaitlistStatus.WAITING);
+        if (queue.isEmpty()) {
+            return;
+        }
+        WaitlistEntry next = queue.get(0);
+
+        SeatReservation offer = new SeatReservation();
+        offer.setStudent(next.getStudent());
+        offer.setAClass(aClass);
+        offer.setStatus(ReservationStatus.HELD);
+        offer.setReservedAt(now);
+        offer.setExpiresAt(now.plusMinutes(holdMinutes));
+        reservationRepository.save(offer);
+
+        next.setStatus(WaitlistStatus.OFFERED);
+        waitlistRepository.save(next);
+
+        notificationService.sendNotification(next.getStudent().getUser().getId(),
+                "A seat is now available in class " + aClass.getName()
+                        + ". Pay within " + holdMinutes + " minutes to confirm it.");
     }
 }

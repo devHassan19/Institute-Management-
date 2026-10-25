@@ -2,12 +2,15 @@ package com.example.institute.institute.repository;
 
 import com.example.institute.institute.model.ReservationStatus;
 import com.example.institute.institute.model.SeatReservation;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface SeatReservationRepository extends JpaRepository<SeatReservation, Long> {
 
@@ -26,6 +29,7 @@ public interface SeatReservationRepository extends JpaRepository<SeatReservation
                           @Param("now") LocalDateTime now);
 
     List<SeatReservation> findByStatusAndExpiresAtBefore(ReservationStatus status, LocalDateTime time);
-
     List<SeatReservation> findByStudentIdOrderByReservedAtDesc(Long studentId);
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<SeatReservation> findWithLockById(Long id);
 }

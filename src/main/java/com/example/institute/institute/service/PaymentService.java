@@ -5,11 +5,7 @@ import com.example.institute.institute.exception.InformationExistException;
 import com.example.institute.institute.exception.InformationNotFoundException;
 import com.example.institute.institute.exception.UnprocessableEntityException;
 import com.example.institute.institute.model.*;
-import com.example.institute.institute.repository.EnrollmrntRepository;
-import com.example.institute.institute.repository.PaymentRepository;
-import com.example.institute.institute.repository.SeatReservationRepository;
-import com.example.institute.institute.repository.StudentRepository;
-import com.example.institute.institute.repository.UserRepository;
+import com.example.institute.institute.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -30,6 +26,7 @@ public class PaymentService {
     private final UserRepository userRepository;
     private final NotificationService notificationService;
     private final AuditLogService auditLogService;
+    private final WaitlistEntryRepository waitlistRepository;
 
     @Transactional
     public Payment pay(Long reservationId, String method) {
@@ -39,7 +36,7 @@ public class PaymentService {
             throw new InformationNotFoundException("Student not found");
         }
 
-        SeatReservation reservation = reservationRepository.findById(reservationId)
+        SeatReservation reservation = reservationRepository.findWithLockById(reservationId)
                 .orElseThrow(() -> new InformationNotFoundException("Reservation not found"));
 
         if (!reservation.getStudent().getId().equals(student.getId())) {
@@ -72,6 +69,12 @@ public class PaymentService {
         reservation.setEnrollment(enrollment);
         reservation.setStatus(ReservationStatus.CONFIRMED);
         reservationRepository.save(reservation);
+
+        for (WaitlistEntry w : waitlistRepository.findEntries(
+                student.getId(), reservation.getAClass().getId(), WaitlistStatus.OFFERED)) {
+            w.setStatus(WaitlistStatus.COMPLETED);
+            waitlistRepository.save(w);
+        }
 
         String className = reservation.getAClass().getName();
         notificationService.sendNotification(currentUser.getId(),

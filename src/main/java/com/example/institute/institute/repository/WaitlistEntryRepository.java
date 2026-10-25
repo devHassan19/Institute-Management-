@@ -22,4 +22,9 @@ public interface WaitlistEntryRepository extends JpaRepository<WaitlistEntry, Lo
                                              @Param("status") WaitlistStatus status);
 
     List<WaitlistEntry> findByStudentId(Long studentId);
+    @Query("select w from WaitlistEntry w " +
+            "where w.student.id = :studentId and w.aClass.id = :classId and w.status = :status")
+    List<WaitlistEntry> findEntries(@Param("studentId") Long studentId,
+                                    @Param("classId") Long classId,
+                                    @Param("status") WaitlistStatus status);
 }
