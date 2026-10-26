@@ -17,12 +17,12 @@ public class EnrollmentController {
 
     private EnrollmentService enrollmentService;
 
-    @PostMapping("/enrollmrnts")
-    public ResponseEntity<Enrollment> createIEnrollment(@RequestBody Enrollment enrollment) {
-        System.out.println("Calling createEnrollment ==> ");
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(enrollmentService.createIEnrollment(enrollment));
-    }
+//    @PostMapping("/enrollmrnts")
+//    public ResponseEntity<Enrollment> createIEnrollment(@RequestBody Enrollment enrollment) {
+//        System.out.println("Calling createEnrollment ==> ");
+//        return ResponseEntity.status(HttpStatus.CREATED)
+//                .body(enrollmentService.createIEnrollment(enrollment));
+//    }
 
     @GetMapping("enrollmrnts")
     public List<Enrollment> getEnrollments() {
