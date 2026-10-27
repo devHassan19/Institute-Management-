@@ -11,7 +11,7 @@ public class ReservationScheduler {
 
     private final ReservationService reservationService;
 
-//Start again after 30 if first is expired
+//Start again after 30 if first is expired (call Scheduled thread)
     @Scheduled(fixedDelay = 30000)
     public void releaseExpiredReservations() {
         System.out.println("[" + Thread.currentThread().getName() + "] checking expired reservations...");

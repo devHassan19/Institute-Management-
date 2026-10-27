@@ -34,6 +34,7 @@ public class ReservationService {
     @Value("${institute.reservation-minutes:1}")
     private long holdMinutes;
 
+//    Make sure for the user and status
     @Transactional
     public ReservationResponse reserve(Long classId) {
         User user = EnrollmentService.getCurrentLogginUser();
@@ -47,6 +48,7 @@ public class ReservationService {
         return reserveSeat(student.getId(), classId);
     }
 
+//    Check the seat to reserve
     @Transactional
     public ReservationResponse reserveSeat(Long studentId, Long classId) {
         Student student = studentRepository.findById(studentId)

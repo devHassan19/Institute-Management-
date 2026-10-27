@@ -49,6 +49,7 @@ public class PaymentService {
             throw new UnprocessableEntityException("Reservation expired. Please reserve again.");
         }
 
+//        record new payment
         Payment payment = new Payment();
         payment.setReservation(reservation);
         BigDecimal amount = reservation.getAClass().getFee();
@@ -61,11 +62,13 @@ public class PaymentService {
         payment.setPaidAt(LocalDateTime.now());
         paymentRepository.save(payment);
 
+//        Make new enrollment after make payment process
         Enrollment enrollment = new Enrollment();
         enrollment.setStudent(student);
         enrollment.setAClass(reservation.getAClass());
         enrollment = enrollmrntRepository.save(enrollment);
 
+//        Update the reserve status
         reservation.setEnrollment(enrollment);
         reservation.setStatus(ReservationStatus.CONFIRMED);
         reservationRepository.save(reservation);
