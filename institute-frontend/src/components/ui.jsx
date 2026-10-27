@@ -1,4 +1,6 @@
 import {useEffect,useState} from 'react';
+import {createPortal} from 'react-dom';
+
 
 const P={
   home:'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
@@ -60,14 +62,16 @@ export function Modal({open,onClose,title,wide,closable=true,children}){
     return()=>{document.removeEventListener('keydown',onKey);document.body.style.overflow=prev};
   },[open,closable,onClose]);
   if(!open)return null;
-  return <div className="overlay" onMouseDown={()=>closable&&onClose?.()}>
-    <div className={`modal ${wide?'wide':''}`} role="dialog" aria-modal="true" onMouseDown={e=>e.stopPropagation()}>
-      {title&&<div className="modal-head"><h2>{title}</h2>{closable&&<button className="icon-btn" onClick={onClose} aria-label="Close"><Icon name="x"/></button>}</div>}
-      {children}
-    </div>
-  </div>;
+  return createPortal(
+      <div className="overlay" onMouseDown={()=>closable&&onClose?.()}>
+        <div className={`modal ${wide?'wide':''}`} role="dialog" aria-modal="true" onMouseDown={e=>e.stopPropagation()}>
+          {title&&<div className="modal-head"><h2>{title}</h2>{closable&&<button className="icon-btn" onClick={onClose} aria-label="Close"><Icon name="x"/></button>}</div>}
+          {children}
+        </div>
+      </div>,
+      document.body
+  );
 }
-
 export function Empty({icon='layers',title,text,action}){
   return <div className="empty"><div className="eico"><Icon name={icon} size={26}/></div><b>{title}</b>{text&&<p>{text}</p>}{action}</div>;
 }
