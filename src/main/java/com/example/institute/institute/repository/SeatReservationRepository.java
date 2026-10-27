@@ -32,4 +32,5 @@ public interface SeatReservationRepository extends JpaRepository<SeatReservation
     List<SeatReservation> findByStudentIdOrderByReservedAtDesc(Long studentId);
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<SeatReservation> findWithLockById(Long id);
+    Optional<SeatReservation> findByEnrollmentId(Long enrollmentId);
 }

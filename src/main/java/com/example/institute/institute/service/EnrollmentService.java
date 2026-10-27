@@ -6,10 +6,7 @@ import com.example.institute.institute.model.*;
 import com.example.institute.institute.exception.InformationExistException;
 import com.example.institute.institute.exception.InformationNotFoundException;
 import com.example.institute.institute.model.Class;
-import com.example.institute.institute.repository.ClassRepository;
-import com.example.institute.institute.repository.EnrollmrntRepository;
-import com.example.institute.institute.repository.StudentRepository;
-import com.example.institute.institute.repository.UserRepository;
+import com.example.institute.institute.repository.*;
 import com.example.institute.institute.security.MyUserDetails;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +25,7 @@ public class EnrollmentService {
     private AuditLogService auditLogService;
     private UserRepository userRepository;
     private NotificationService notificationService;
+    private SeatReservationRepository seatReservationRepository;
 
     public static User getCurrentLogginUser() {
         MyUserDetails myUserDetails = (MyUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -74,7 +72,8 @@ public class EnrollmentService {
         // Notify Admin
         List<User> admins = userRepository.findByRole("ADMIN");
 
-        for (User admin : admins) {notificationService.sendNotification(admin.getId(),
+        for (User admin : admins) {
+            notificationService.sendNotification(admin.getId(),
                     "Student " + student.getName()
                             + " enrolled in Class: " + aclass.getName()
             );
@@ -132,6 +131,11 @@ public class EnrollmentService {
         Enrollment enrollment = getEnrollment(enrollmentId);
         auditLogService.createLog(userId, "DELETE", "Enrollment",
                 enrollment.getId(), "DELETE Enrollment To Student: " + enrollment.getStudent().getName() + ", From Class: " + enrollment.getAClass().getName());
+        seatReservationRepository.findByEnrollmentId(enrollment.getId()).ifPresent(reservation -> {
+            reservation.setEnrollment(null);
+            reservation.setStatus(ReservationStatus.CANCELLED);
+            seatReservationRepository.save(reservation);
+        });
         enrollmrntRepository.delete(enrollment);
     }
 
@@ -162,13 +166,19 @@ public class EnrollmentService {
         // Notify Admin
         List<User> admins = userRepository.findByRole("ADMIN");
 
-        for (User admin : admins) {notificationService.sendNotification(admin.getId(),
-                "Student " + student.getName()
-                        + " Drop of Class: " + enrollmentId.getClass().getName()
-        );
+        for (User admin : admins) {
+            notificationService.sendNotification(admin.getId(),
+                    "Student " + student.getName()
+                            + " Drop of Class: " + enrollmentId.getClass().getName()
+            );
         }
         auditLogService.createLog(userId, "DELETE", "Enrollment",
                 enrollment.getId(), "DELETE Enrollment To Student: " + enrollment.getStudent().getName() + ", From Class: " + enrollment.getAClass().getName());
+        seatReservationRepository.findByEnrollmentId(enrollment.getId()).ifPresent(reservation -> {
+            reservation.setEnrollment(null);
+            reservation.setStatus(ReservationStatus.CANCELLED);
+            seatReservationRepository.save(reservation);
+        });
         enrollmrntRepository.delete(enrollment);
     }
 }

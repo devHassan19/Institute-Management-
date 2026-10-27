@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-// بيانات المستخدم الحالي: عرض (GET) وتعديل (PUT)
 @RestController
 @RequestMapping("/api")
 public class MeController {
@@ -48,3 +47,4 @@ public class MeController {
         return me();
     }
 }
+
