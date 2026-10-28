@@ -1,0 +1,190 @@
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m----------------------------< [0;36mcom.ga:food[0;1m >-----------------------------[m
+[[1;34mINFO[m] [1mBuilding  0.0.1-SNAPSHOT[m
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:3.5.0:resources[m [1m(default-resources)[m @ [36mfood[0;1m ---[m
+[[1;34mINFO[m] Copying 3 resources from src/main/resources to target/classes
+[[1;34mINFO[m] Copying 0 resource from src/main/resources to target/classes
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.15.0:compile[m [1m(default-compile)[m @ [36mfood[0;1m ---[m
+[[1;34mINFO[m] Nothing to compile - all classes are up to date.
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:3.5.0:testResources[m [1m(default-testResources)[m @ [36mfood[0;1m ---[m
+[[1;34mINFO[m] Copying 1 resource from src/test/resources to target/test-classes
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.15.0:testCompile[m [1m(default-testCompile)[m @ [36mfood[0;1m ---[m
+[[1;34mINFO[m] Recompiling the module because of [1mchanged source code[m.
+[[1;34mINFO[m] Compiling 4 source files with javac [debug parameters release 17] to target/test-classes
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-surefire-plugin:3.5.6:test[m [1m(default-test)[m @ [36mfood[0;1m ---[m
+[[1;34mINFO[m] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[[1;34mINFO[m] 
+[[1;34mINFO[m] -------------------------------------------------------
+[[1;34mINFO[m]  T E S T S
+[[1;34mINFO[m] -------------------------------------------------------
+[[1;34mINFO[m] Running com.example.institute.institute.[1mReservationConcurrencyTest[m
+12:17:51.147 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.example.institute.institute.ReservationConcurrencyTest]: ReservationConcurrencyTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+12:17:51.269 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.example.institute.institute.InstituteApplication for test class com.example.institute.institute.ReservationConcurrencyTest
+12:17:51.368 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.example.institute.institute.ReservationConcurrencyTest]: ReservationConcurrencyTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+12:17:51.371 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.example.institute.institute.InstituteApplication for test class com.example.institute.institute.ReservationConcurrencyTest
+12:17:51.451 [main] INFO org.springframework.boot.devtools.restart.RestartApplicationListener -- Restart disabled due to context in which it is running
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-10-28T12:17:51.753+03:00  INFO 275975 --- [institute] [           main] c.e.i.i.ReservationConcurrencyTest       : Starting ReservationConcurrencyTest using Java 17.0.20.1 with PID 275975 (started by hassnko in /home/hassnko/Desktop/Ga_Java/Projects/project02/institute)
+2026-10-28T12:17:51.755+03:00  INFO 275975 --- [institute] [           main] c.e.i.i.ReservationConcurrencyTest       : The following 1 profile is active: "test"
+2026-10-28T12:17:52.864+03:00  INFO 275975 --- [institute] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-28T12:17:52.966+03:00  INFO 275975 --- [institute] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 89 ms. Found 13 JPA repository interfaces.
+2026-10-28T12:17:53.693+03:00  INFO 275975 --- [institute] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-10-28T12:17:53.809+03:00  INFO 275975 --- [institute] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-10-28T12:17:54.287+03:00  INFO 275975 --- [institute] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-28T12:17:54.335+03:00  INFO 275975 --- [institute] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-28T12:17:54.650+03:00  INFO 275975 --- [institute] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@753e4eb5
+2026-10-28T12:17:54.654+03:00  INFO 275975 --- [institute] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-28T12:17:54.760+03:00  INFO 275975 --- [institute] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/Institute_Test]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.6
+	Default catalog/schema: Institute_Test/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-10-28T12:17:56.267+03:00  INFO 275975 --- [institute] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-28T12:17:56.418+03:00  INFO 275975 --- [institute] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-28T12:17:56.568+03:00  INFO 275975 --- [institute] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-28T12:17:58.094+03:00  WARN 275975 --- [institute] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-10-28T12:17:58.299+03:00  INFO 275975 --- [institute] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name myUserDetailsService
+2026-10-28T12:17:59.331+03:00  INFO 275975 --- [institute] [           main] c.e.i.i.ReservationConcurrencyTest       : Started ReservationConcurrencyTest in 7.893 seconds (process running for 9.194)
+[scheduling-1] checking expired reservations...
+Seed data completed successfully!
+Java HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+[notify-1] notifying user 5
+[notify-2] notifying user 4
+USER 5 IS NOT CONNECTED
+[notify-1] notifying user 10
+USER 4 IS NOT CONNECTED
+[notify-2] notifying user 9
+USER 10 IS NOT CONNECTED
+[notify-1] notifying user 3
+USER 9 IS NOT CONNECTED
+[notify-2] notifying user 1
+USER 3 IS NOT CONNECTED
+[notify-1] notifying user 50
+USER 1 IS NOT CONNECTED
+[notify-2] notifying user 2
+USER 50 IS NOT CONNECTED
+[notify-1] notifying user 6
+USER 2 IS NOT CONNECTED
+[notify-2] notifying user 7
+USER 6 IS NOT CONNECTED
+[notify-1] notifying user 11
+USER 7 IS NOT CONNECTED
+[notify-2] notifying user 12
+USER 11 IS NOT CONNECTED
+[notify-1] notifying user 13
+USER 12 IS NOT CONNECTED
+[notify-2] notifying user 8
+USER 13 IS NOT CONNECTED
+[notify-1] notifying user 14
+USER 8 IS NOT CONNECTED
+[notify-2] notifying user 15
+USER 14 IS NOT CONNECTED
+[notify-1] notifying user 16
+USER 15 IS NOT CONNECTED
+[notify-2] notifying user 17
+USER 16 IS NOT CONNECTED
+[notify-1] notifying user 18
+USER 17 IS NOT CONNECTED
+[notify-2] notifying user 20
+USER 18 IS NOT CONNECTED
+[notify-1] notifying user 19
+USER 20 IS NOT CONNECTED
+[notify-2] notifying user 22
+USER 22 IS NOT CONNECTED
+USER 19 IS NOT CONNECTED
+[notify-2] notifying user 21
+[notify-1] notifying user 23
+USER 23 IS NOT CONNECTED
+USER 21 IS NOT CONNECTED
+[notify-2] notifying user 24
+[notify-1] notifying user 26
+USER 24 IS NOT CONNECTED
+USER 26 IS NOT CONNECTED
+[notify-2] notifying user 25
+[notify-1] notifying user 27
+USER 27 IS NOT CONNECTED
+[notify-1] notifying user 29
+USER 25 IS NOT CONNECTED
+[notify-2] notifying user 28
+USER 29 IS NOT CONNECTED
+USER 28 IS NOT CONNECTED
+[notify-1] notifying user 31
+[notify-2] notifying user 32
+USER 31 IS NOT CONNECTED
+[notify-1] notifying user 30
+USER 32 IS NOT CONNECTED
+[notify-2] notifying user 33
+USER 30 IS NOT CONNECTED
+[notify-1] notifying user 34
+USER 33 IS NOT CONNECTED
+[notify-2] notifying user 35
+USER 34 IS NOT CONNECTED
+[notify-1] notifying user 37
+USER 35 IS NOT CONNECTED
+[notify-2] notifying user 36
+USER 36 IS NOT CONNECTED
+USER 37 IS NOT CONNECTED
+[notify-1] notifying user 39
+[notify-2] notifying user 38
+USER 39 IS NOT CONNECTED
+[notify-1] notifying user 40
+USER 38 IS NOT CONNECTED
+[notify-2] notifying user 41
+USER 40 IS NOT CONNECTED
+[notify-1] notifying user 42
+USER 41 IS NOT CONNECTED
+[notify-2] notifying user 44
+USER 44 IS NOT CONNECTED
+USER 42 IS NOT CONNECTED
+[notify-2] notifying user 43
+USER 43 IS NOT CONNECTED
+[notify-1] notifying user 45
+USER 45 IS NOT CONNECTED
+[notify-2] notifying user 46
+USER 46 IS NOT CONNECTED
+[notify-1] notifying user 48
+USER 48 IS NOT CONNECTED
+[notify-2] notifying user 47
+USER 47 IS NOT CONNECTED
+[notify-1] notifying user 49
+USER 49 IS NOT CONNECTED
+HELD = 5
+WAITLISTED = 45
+ERRORS = 0
+ACTIVE HOLDS IN DB = 5
+WAITLIST ENTRIES IN DB = 45
+[[1;34mINFO[m] [1;32mTests run: [0;1;32m1[m, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 12.62 s -- in com.example.institute.institute.[1mReservationConcurrencyTest[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] Results:
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1;32mTests run: 1, Failures: 0, Errors: 0, Skipped: 0[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1;32mBUILD SUCCESS[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] Total time:  17.074 s
+[[1;34mINFO[m] Finished at: 2026-10-28T12:18:03+03:00
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m

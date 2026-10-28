@@ -1,15 +1,29 @@
+
 package com.example.institute.institute;
+
+//If you want test use this commend in terminal
+//set -a
+//source .env
+//set +a
+//
+//mvn -Dtest=ReservationConcurrencyTest test > test-error.log 2>&1
+
+//And this to see result
+//grep -E "HELD =|WAITLISTED =|ERRORS =|ACTIVE HOLDS IN DB =|WAITLIST ENTRIES IN DB =|Tests run:|BUILD SUCCESS|BUILD FAILURE|cleanUp" test-error.log | tail -n 30
 
 import com.example.institute.institute.model.*;
 import com.example.institute.institute.model.Class;
 import com.example.institute.institute.model.response.ReservationResponse;
 import com.example.institute.institute.repository.*;
 import com.example.institute.institute.service.ReservationService;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import com.example.institute.institute.repository.NotificationRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,22 +34,40 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class ReservationConcurrencyTest {
 
     private static final int STUDENTS = 50;
     private static final int CAPACITY = 5;
 
-    @Autowired private ReservationService reservationService;
-    @Autowired private UserRepository userRepository;
-    @Autowired private CourseRepository courseRepository;
-    @Autowired private InstructorRepository instructorRepository;
-    @Autowired private ClassRepository classRepository;
-    @Autowired private SeatReservationRepository reservationRepository;
-    @Autowired private WaitlistEntryRepository waitlistRepository;
+    @Autowired
+    private ReservationService reservationService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private CourseRepository courseRepository;
+
+    @Autowired
+    private InstructorRepository instructorRepository;
+
+    @Autowired
+    private ClassRepository classRepository;
+
+    @Autowired
+    private SeatReservationRepository reservationRepository;
+
+    @Autowired
+    private WaitlistEntryRepository waitlistRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     private Course course;
     private Instructor instructor;
     private Class aClass;
+
     private final List<User> users = new ArrayList<>();
     private final List<Long> studentIds = new ArrayList<>();
 
@@ -75,6 +107,7 @@ class ReservationConcurrencyTest {
             user.setStudent(student);
 
             user = userRepository.save(user);
+
             users.add(user);
             studentIds.add(user.getStudent().getId());
         }
@@ -82,57 +115,128 @@ class ReservationConcurrencyTest {
 
     @Test
     void fiftyStudentsRaceForFiveSeats() throws Exception {
+
         ExecutorService pool = Executors.newFixedThreadPool(STUDENTS);
+
         CountDownLatch ready = new CountDownLatch(STUDENTS);
         CountDownLatch go = new CountDownLatch(1);
+
         AtomicInteger held = new AtomicInteger();
         AtomicInteger waitlisted = new AtomicInteger();
         AtomicInteger errors = new AtomicInteger();
+
         List<Future<String>> futures = new ArrayList<>();
 
-        for (Long studentId : studentIds) {
-            Callable<String> task = () -> {
-                ready.countDown();
-                go.await();
-                try {
-                    ReservationResponse r = reservationService.reserveSeat(studentId, aClass.getId());
-                    if ("HELD".equals(r.status())) {
-                        held.incrementAndGet();
-                    } else {
-                        waitlisted.incrementAndGet();
+        try {
+            for (Long studentId : studentIds) {
+
+                Callable<String> task = () -> {
+                    ready.countDown();
+                    go.await();
+
+                    try {
+                        ReservationResponse response =
+                                reservationService.reserveSeat(
+                                        studentId,
+                                        aClass.getId()
+                                );
+
+                        if ("HELD".equals(response.status())) {
+                            held.incrementAndGet();
+                        } else if ("WAITLISTED".equals(response.status())) {
+                            waitlisted.incrementAndGet();
+                        } else {
+                            errors.incrementAndGet();
+                        }
+
+                        return response.status();
+
+                    } catch (Exception e) {
+                        errors.incrementAndGet();
+                        return "ERROR: " + e.getMessage();
                     }
-                    return r.status();
-                } catch (Exception e) {
-                    errors.incrementAndGet();
-                    return "ERROR: " + e.getMessage();
-                }
-            };
-            futures.add(pool.submit(task));
+                };
+
+                futures.add(pool.submit(task));
+            }
+
+            // Wait until all threads are ready
+            ready.await();
+
+            // Start all reservations together
+            go.countDown();
+
+            for (Future<String> future : futures) {
+                future.get(60, TimeUnit.SECONDS);
+            }
+
+        } finally {
+            pool.shutdownNow();
+            pool.awaitTermination(10, TimeUnit.SECONDS);
         }
 
-        ready.await();
-        go.countDown();
-        for (Future<String> f : futures) {
-            f.get(30, TimeUnit.SECONDS);
-        }
-        pool.shutdown();
+        long activeHolds = reservationRepository.countActiveHolds(
+                aClass.getId(),
+                ReservationStatus.HELD,
+                LocalDateTime.now()
+        );
 
-        long inDb = reservationRepository.countActiveHolds(aClass.getId(), ReservationStatus.HELD, LocalDateTime.now());
-        System.out.println("HELD = " + held.get() + ", WAITLISTED = " + waitlisted.get()
-                + ", ERRORS = " + errors.get() + ", HELD in DB = " + inDb);
+        long waitingEntries = waitlistRepository
+                .findQueue(aClass.getId(), WaitlistStatus.WAITING)
+                .size();
 
-        assertEquals(CAPACITY, inDb);
+        System.out.println("HELD = " + held.get());
+        System.out.println("WAITLISTED = " + waitlisted.get());
+        System.out.println("ERRORS = " + errors.get());
+        System.out.println("ACTIVE HOLDS IN DB = " + activeHolds);
+        System.out.println("WAITLIST ENTRIES IN DB = " + waitingEntries);
+
+        assertEquals(CAPACITY, held.get(),
+                "Exactly 5 students should reserve seats");
+
+        assertEquals(STUDENTS - CAPACITY, waitlisted.get(),
+                "The remaining students should be waitlisted");
+
+        assertEquals(0, errors.get(),
+                "There should be no reservation errors");
+
+        assertEquals(CAPACITY, activeHolds,
+                "Database should contain exactly 5 active holds");
+
+        assertEquals(STUDENTS - CAPACITY, waitingEntries,
+                "Database should contain 45 waiting entries");
     }
 
     @AfterEach
     void cleanUp() {
+        notificationRepository.deleteAll();
+
         for (Long id : studentIds) {
-            reservationRepository.deleteAll(reservationRepository.findByStudentIdOrderByReservedAtDesc(id));
-            waitlistRepository.deleteAll(waitlistRepository.findByStudentId(id));
+            reservationRepository.deleteAll(
+                    reservationRepository
+                            .findByStudentIdOrderByReservedAtDesc(id)
+            );
+
+            waitlistRepository.deleteAll(
+                    waitlistRepository.findByStudentId(id)
+            );
         }
+
         userRepository.deleteAll(users);
-        classRepository.delete(aClass);
-        courseRepository.delete(course);
-        instructorRepository.delete(instructor);
+
+        if (aClass != null) {
+            classRepository.delete(aClass);
+        }
+
+        if (course != null) {
+            courseRepository.delete(course);
+        }
+
+        if (instructor != null) {
+            instructorRepository.delete(instructor);
+        }
+
+        studentIds.clear();
+        users.clear();
     }
 }
