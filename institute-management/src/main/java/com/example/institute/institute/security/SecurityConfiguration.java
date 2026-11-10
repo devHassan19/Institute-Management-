@@ -47,7 +47,10 @@ public class SecurityConfiguration {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/uploads/**",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/api/students/internal",
+                                "/error",
+                                "/swagger-ui/**"
                         ).permitAll()
                         .anyRequest().authenticated());
         http.addFilterBefore(

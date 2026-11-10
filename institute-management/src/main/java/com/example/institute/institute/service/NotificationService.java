@@ -7,6 +7,9 @@ import com.example.institute.institute.repository.StudentRepository;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.client.RestClient;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,6 +19,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 public class NotificationService {
+    @Value("${notification.service.url}")
+    private String notificationServiceUrl;
 
     private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
 
@@ -55,30 +60,21 @@ public class NotificationService {
 
     @Async("notificationExecutor")
     public void sendNotification(Long userId, String message) {
-        System.out.println("[" + Thread.currentThread().getName() + "] notifying user " + userId);
 
-        Student student = studentRepository.findByUserId(userId);
-        if (student != null) {
-            Notification n = new Notification();
-            n.setStudent(student);
-            n.setType("INFO");
-            n.setMessage(message);
-            n.setCreatedAt(LocalDateTime.now());
-            notificationRepository.save(n);
-        }
-        SseEmitter emitter = emitters.get(userId);
-        if (emitter == null) {
-            System.out.println("USER " + userId + " IS NOT CONNECTED");
-            return;
-        }
+        System.out.println("Sending notification to user: " + userId);
 
         try {
-            emitter.send(SseEmitter.event().name("notification").data(message));
-            System.out.println("NOTIFICATION SENT TO USER: " + userId);
+            RestClient.create()
+                    .post()
+                    .uri(notificationServiceUrl + "/api/notifications/send/" + userId)
+                    .body(message)
+                    .retrieve()
+                    .toBodilessEntity();
+
+            System.out.println("Notification request sent successfully");
 
         } catch (Exception e) {
-            emitters.remove(userId);
-            System.out.println("FAILED TO SEND NOTIFICATION TO USER: " + userId);
+            System.out.println("Failed to send notification: " + e.getMessage());
         }
     }
 }

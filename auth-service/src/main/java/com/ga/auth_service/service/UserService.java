@@ -31,6 +31,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestClient;
 import java.util.Map;
+import org.springframework.context.ApplicationEventPublisher;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,6 +43,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -48,16 +51,18 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final VerificationTokenRepository tokenRepository;
     private final EmailService emailService;
+    private final ApplicationEventPublisher applicationEventPublisher;
     private MyUserDetails myUserDetails;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     @Value("${institute.service.url}")
     private String instituteServiceUrl;
 
+
     @Value("${internal.api.secret}")
     private String internalApiSecret;
 
 
-    private void createStudentInInstitute(User user) {
+    public void createStudentInInstitute(User user) {
         RestClient.create()
                 .post()
                 .uri(instituteServiceUrl + "/api/students/internal")
@@ -137,7 +142,7 @@ public class UserService {
     public UserService(UserRepository userRepository,
                        @Lazy PasswordEncoder passwordEncoder,
                        JWTUtils jwtUtils,
-                       @Lazy AuthenticationManager authenticationManager,
+                       @Lazy AuthenticationManager authenticationManager, ApplicationEventPublisher applicationEventPublisher,
                        @Lazy MyUserDetails myUserDetails,
                        VerificationTokenRepository tokenRepository,
                        EmailService emailService,
@@ -146,6 +151,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
+        this.applicationEventPublisher = applicationEventPublisher;
         this.myUserDetails = myUserDetails;
         this.tokenRepository = tokenRepository;
         this.emailService = emailService;
@@ -176,7 +182,7 @@ public class UserService {
 
             User saved = userRepository.save(userObject);
             if ("STUDENT".equals(saved.getRole())) {
-                createStudentInInstitute(saved);
+                applicationEventPublisher.publishEvent(saved);
             }
             VerificationToken token = new VerificationToken(saved);
 

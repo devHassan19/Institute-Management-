@@ -50,6 +50,13 @@ public class UserController {
 
         System.out.println("Calling createUser ==>");
 
+        username = username.trim().replaceAll("[,]+$", "");
+        emailAddress = emailAddress.trim().replaceAll("[,]+$", "");
+        password = password.trim().replaceAll("[,]+$", "");
+        firstName = firstName.trim().replaceAll("[,]+$", "");
+        lastName = lastName.trim().replaceAll("[,]+$", "");
+        mobileNumber = mobileNumber.trim().replaceAll("[,]+$", "");
+
         User user = new User();
 
         user.setUsername(username);
