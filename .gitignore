@@ -4,3 +4,12 @@
 .idea/
 **/uploads/
 **/test-error.log
+
+# Secrets
+.env
+**/.env
+
+# Generated files
+**/target/
+*.jar
+*.zip
