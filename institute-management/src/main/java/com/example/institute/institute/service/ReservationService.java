@@ -31,7 +31,7 @@ public class ReservationService {
     private final NotificationService notificationService;
 
 
-    @Value("${institute.reservation-minutes:1}")
+    @Value("${institute.reservation-minutes:10}")
     private long holdMinutes;
 
 //    Make sure for the user and status
