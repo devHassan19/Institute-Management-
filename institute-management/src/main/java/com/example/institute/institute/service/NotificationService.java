@@ -61,8 +61,33 @@ public class NotificationService {
     @Async("notificationExecutor")
     public void sendNotification(Long userId, String message) {
 
-        System.out.println("Sending notification to user: " + userId);
+        // 1) Save it, so the Notifications page has a history (students only)
+        try {
+            Student student = studentRepository.findByUserId(userId);
+            if (student != null) {
+                Notification n = new Notification();
+                n.setStudent(student);
+                n.setType("GENERAL");
+                n.setMessage(message);
+                n.setIsRead(false);
+                n.setCreatedAt(LocalDateTime.now());
+                notificationRepository.save(n);
+            }
+        } catch (Exception e) {
+            System.out.println("Failed to save notification: " + e.getMessage());
+        }
 
+        // 2) Push it live to the browser connected to this service
+        SseEmitter emitter = emitters.get(userId);
+        if (emitter != null) {
+            try {
+                emitter.send(SseEmitter.event().data(message));
+            } catch (Exception e) {
+                emitters.remove(userId);
+            }
+        }
+
+        // 3) Keep forwarding to notification-service (existing behaviour)
         try {
             RestClient.create()
                     .post()
@@ -70,11 +95,8 @@ public class NotificationService {
                     .body(message)
                     .retrieve()
                     .toBodilessEntity();
-
-            System.out.println("Notification request sent successfully");
-
         } catch (Exception e) {
-            System.out.println("Failed to send notification: " + e.getMessage());
+            System.out.println("Failed to forward notification: " + e.getMessage());
         }
     }
 }
