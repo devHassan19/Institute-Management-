@@ -1,34 +1,34 @@
 pipeline {
     agent any
 
-    options {
-        timestamps()
-        disableConcurrentBuilds()
+    tools {
+        maven 'Maven-3.9'
     }
 
     environment {
-        AWS_DEFAULT_REGION = 'us-east-1'
-        S3_BUCKET          = 'your-eb-deploy-bucket'
-        EB_APPLICATION     = 'institute-management'
-        EB_ENVIRONMENT     = 'institute-management-env'
-        VERSION_LABEL      = "build-${env.BUILD_NUMBER}"
+        AWS_DEFAULT_REGION = 'eu-north-1'
     }
 
     stages {
+        stage('Hello') {
+            steps {
+                echo 'Hello Institute Microservices'
+            }
+        }
+
         stage('Pull from GitHub') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/<your-user>/Institute-Management-.git'
+                    url: 'https://github.com/devHassan19/Institute-Management-.git'
             }
         }
 
         stage('Build with Maven') {
             steps {
                 sh '''
-                    chmod +x institute-management/mvnw auth-service/mvnw notification-service/mvnw
-                    (cd institute-management && ./mvnw -B clean package -DskipTests)
-                    (cd auth-service         && ./mvnw -B clean package -DskipTests)
-                    (cd notification-service && ./mvnw -B clean package -DskipTests)
+                    mvn -f auth-service/pom.xml clean package -DskipTests
+                    mvn -f institute-management/pom.xml clean package -DskipTests
+                    mvn -f notification-service/pom.xml clean package -DskipTests
                 '''
             }
         }
@@ -36,30 +36,39 @@ pipeline {
         stage('Prepare Deployment') {
             steps {
                 sh '''
-                    cp institute-management/target/institute-management-0.0.1-SNAPSHOT.jar aws-deployment/institute-management/
                     cp auth-service/target/auth-service-0.0.1-SNAPSHOT.jar aws-deployment/auth-service/
+                    cp institute-management/target/institute-management-0.0.1-SNAPSHOT.jar aws-deployment/institute-management/
                     cp notification-service/target/notification-service-0.0.1-SNAPSHOT.jar aws-deployment/notification-service/
+
+                    rm -f deployment.zip
                     cd aws-deployment
-                    rm -f ../deployment.zip
-                    zip -r ../deployment.zip . -x "*.git*"
+                    jar --create --file ../deployment.zip -C . .
+                    cd ..
+                    jar tf deployment.zip
                 '''
             }
         }
 
         stage('Deploy to AWS') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'aws-credentials',
-                                                  usernameVariable: 'AWS_ACCESS_KEY_ID',
-                                                  passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                withCredentials([
+                    string(credentialsId: 'AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
                     sh '''
-                        aws s3 cp deployment.zip s3://$S3_BUCKET/$VERSION_LABEL.zip
+                        BUCKET=$(aws elasticbeanstalk create-storage-location --query S3Bucket --output text)
+                        VERSION="jenkins-${BUILD_NUMBER}"
+
+                        aws s3 cp deployment.zip "s3://${BUCKET}/deployments/${VERSION}.zip"
+
                         aws elasticbeanstalk create-application-version \
-                            --application-name "$EB_APPLICATION" \
-                            --version-label "$VERSION_LABEL" \
-                            --source-bundle S3Bucket="$S3_BUCKET",S3Key="$VERSION_LABEL.zip"
+                          --application-name Institute-Microservices \
+                          --version-label "$VERSION" \
+                          --source-bundle S3Bucket="$BUCKET",S3Key="deployments/${VERSION}.zip"
+
                         aws elasticbeanstalk update-environment \
-                            --environment-name "$EB_ENVIRONMENT" \
-                            --version-label "$VERSION_LABEL"
+                          --environment-name Institute-Microservices-env \
+                          --version-label "$VERSION"
                     '''
                 }
             }
